@@ -1,0 +1,81 @@
+    .header-navbar .navbar-header .navbar-brand .brand-logo{
+      width: 97px;
+      max-width: 100%;
+    }
+    .header-navbar .navbar-header .navbar-brand{
+      padding: 9px 0;
+    }
+    .header-navbar{
+
+    }
+    .main-menu.menu-light .navigation > li.active > a{
+    	color: black;
+    }
+    .main-menu.menu-light .navigation > li> a{
+    	color: black;
+    }
+    .header-navbar{
+    	min-height: 3rem;
+    	height: 56px;
+    }
+    .header-navbar .navbar-container ul.nav li > a.nav-link{
+    	font-size: 1rem;
+    }
+  	.navbar-brand{
+  		padding-top: 1.1875rem;
+  	}
+  	.header-navbar .navbar-header{
+  		height: 63px;	
+  	}
+  	.main-menu.menu-fixed{
+  		top: 4rem;
+  	}
+    footer.footer{
+      padding: 0.3rem;
+    }
+    footer>p{
+      color: black;
+    }
+    .text-bold-dark-blue{
+      font-weight: bold;
+      color: darkblue;
+    }
+    h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{
+      font-family: 'Source Sans Pro',sans-serif;
+      color: black;
+    }
+    html body .content .content-wrapper{
+      padding-top: 0;
+    }
+    .btn-app {
+      position:relative;
+      padding:10px 5px;
+      min-width:150px;
+      height:110px;
+      color:steelblue;
+      border:1px solid #ddd;
+      background-color:#f4f4f4;
+      font-size:12px;
+    }
+    .btn-app-title{
+      font-size: 19px;
+      font-weight: bold;
+      color: darkblue;
+      font-family: Calibri;
+    }
+    .page-name-title{
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .card{
+      min-width: 100%;
+    }
+    .carousel-item{
+      text-align: center;
+    }
+    .statics{
+      padding-bottom: 0;
+    }
+    .weather-location{
+      
+    }
