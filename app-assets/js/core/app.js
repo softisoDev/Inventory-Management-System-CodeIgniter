@@ -350,3 +350,7 @@
     });
 
 })(window, document, jQuery);
+
+const app = new Object();
+
+app.host = "http://localhost/inventory/";

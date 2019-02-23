@@ -1,9 +1,9 @@
     .header-navbar .navbar-header .navbar-brand .brand-logo{
-      width: 97px;
+      width: 136px;
       max-width: 100%;
     }
     .header-navbar .navbar-header .navbar-brand{
-      padding: 9px 0;
+      padding: 18px 0;
     }
     .header-navbar{
 
@@ -78,4 +78,27 @@
     }
     .weather-location{
       
+    }
+    .img-float{
+        float: left;
+    }
+    .card-img-top{
+        height: 200px;
+    }
+    .controls-top{
+        padding: 5px 10px;
+    }
+    .view-all-most-seller{
+        padding-bottom: 15px;
+        padding-right: 12px;
+        vertical-align: middle;
+    }
+    .badge{
+        font-weight: bold !important;
+    }
+    .header-bg-color{
+        background: #3461a4 !important;
+    }
+    html body .pace .pace-progress{
+        background: #f15d22 !important;
     }
