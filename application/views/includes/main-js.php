@@ -8,7 +8,8 @@
 <script src="<?php echo base_url('app-assets'); ?>/js/scripts/customizer.js" type="text/javascript"></script>
 <!-- END MODERN JS-->
 
-
+<!--  Switch Buttons  -->
+<script src="<?php echo base_url('app-assets'); ?>/vendors/js/forms/toggle/switchery.min.js" type="text/javascript"></script>
 
 <script src="https://rawgithub.com/darkskyapp/skycons/master/skycons.js"></script>
 

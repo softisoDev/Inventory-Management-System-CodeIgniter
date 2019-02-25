@@ -19,8 +19,6 @@
                     </div>
                 </div>
 
-
-
                 <div class="card-content collapse show">
                     <div class="card-body card-dashboard">
                         <table id="productsTable" class="table display nowrap table-striped table-bordered scroll-horizontal-vertical base-style">

@@ -30,5 +30,7 @@
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('app-assets'); ?>/css/custom.css">
 <!-- END Custom CSS-->
 
-
-
+<!--  BEGIN Switch Button  -->
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('app-assets'); ?>/vendors/css/forms/toggle/switchery.min.css">
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('app-assets'); ?>/css/plugins/forms/switch.css">
+<!--  END Switch Button  -->
