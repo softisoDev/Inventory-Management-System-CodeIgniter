@@ -10,4 +10,10 @@
 <script src="<?php echo base_url('app-assets'); ?>/vendors/js/tables/buttons.html5.min.js" type="text/javascript"></script>
 <script src="<?php echo base_url('app-assets'); ?>/vendors/js/tables/buttons.print.min.js" type="text/javascript"></script>
 <script src="<?php echo base_url('app-assets'); ?>/vendors/js/tables/buttons.colVis.min.js" type="text/javascript"></script>
+<script src="<?php echo base_url('app-assets'); ?>/vendors/js/tables/datatable/dataTables.select.min.js" type="text/javascript"></script>
+<script src="<?php echo base_url('app-assets'); ?>/vendors/js/tables/datatable/dataTables.fixedColumns.min.js" type="text/javascript"></script>
+<script src="<?php echo base_url('app-assets'); ?>/vendors/js/tables/datatable/dataTables.colVis.js" type="text/javascript"></script>
+<!--<script src="<?php /*echo base_url('app-assets'); */?>/vendors/js/tables/datatable/dataTables.colReorder.min.js" type="text/javascript"></script>-->
+<!--<script src="<?php /*echo base_url('app-assets'); */?>/vendors/js/tables/datatable/dataTables.select.min.js" type="text/javascript"></script>-->
 <!--<script src="<?php /*echo base_url('app-assets'); */?>/vendors/js/tables/datatable/dataTables.fixedHeader.min.js" type="text/javascript"></script>-->
+<script src="<?php echo base_url('app-assets'); ?>/js/pages/products-list.js" type="text/javascript"></script>

@@ -75,6 +75,7 @@
       return $this;
     }
 
+
     /**
     * Generates the DISTINCT portion of the query
     *
