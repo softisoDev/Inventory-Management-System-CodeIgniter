@@ -1,7 +1,7 @@
 #productsTable_processing.card{
     min-width: 0 !important;
 }
-#productsTable tbody tr td{
+.dtTable tbody tr td{
     padding-top: 2px !important;
     padding-bottom: 2px !important;
     padding-left: 0.5rem !important;

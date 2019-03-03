@@ -30,3 +30,18 @@ drawTable.on( 'select', function ( e, dt, type, indexes ) {
         $( row ).attr('data-status', 'deneme');
     }
 
+
+/** Make PDF 100% **/
+
+customize : function(doc){
+                var colCount = new Array();
+                var tbl = $('#productsTable');
+                $(tbl).find('tbody tr:first-child td').each(function(){
+                    if($(this).attr('colspan')){
+                        for(var i=1;i<=$(this).attr('colspan');$i++){
+                            colCount.push('*');
+                        }
+                    }else{ colCount.push('*'); }
+                });
+                doc.content[1].table.widths = colCount;
+            }

@@ -33,7 +33,7 @@
 
     var defaults = {
       min: 0,
-      max: 100,
+      max: 100000000000,
       initval: '',
       replacementval: '',
       step: 1,

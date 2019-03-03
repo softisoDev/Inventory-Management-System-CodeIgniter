@@ -12,7 +12,7 @@ var drawTable = $('#productsTable').DataTable( {
     "order": [[ 0, "desc" ]],
     columnDefs:[
         {
-            "targets":[0,20,18,17],
+            "targets":[0,20,18,16,17],
             visible: false
         },
         {
@@ -32,7 +32,8 @@ var drawTable = $('#productsTable').DataTable( {
                 if(type==='display'){
                     var val = row[19]==1 ? "checked" : "unchecked";
                 }
-                var columnData = '<input type="checkbox" id="changeDataStatus" class="switchery" '+val+' data-size="xs"/><label for="changeDataStatus" class="font-medium-2 text-bold-600 ml-1"></label>';
+                var dataID = row[0];
+                var columnData = '<input type="checkbox" data-url="products/isActiveSetter/'+dataID+'" class="js-switch" '+val+' data-size="xs"/><label for="changeDataStatus" class="font-medium-2 text-bold-600 ml-1"></label>';
                 return columnData;
             }
         }
@@ -41,9 +42,9 @@ var drawTable = $('#productsTable').DataTable( {
         drawTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
             var singleRow = this.node();
             dataID = drawTable.row(singleRow).data()[0];
-            $(singleRow).attr('data-product-id', dataID);
+            $(singleRow).attr('data-id', dataID);
         });
-        $('.switchery').each(function () {
+        $('.js-switch').each(function () {
             new Switchery($(this)[0], { size: 'xsmall',className:"switchery switchery-xsmall" });
         });
     },
@@ -54,14 +55,14 @@ var drawTable = $('#productsTable').DataTable( {
     "processing": true,
     "serverSide": true,
     "ajax": {
-        url: app.host+"products/getProductsTable",
+        url: app.host+"products/getDataTable",
         type:"POST"
     },
     dom: "<'row'<'col-md-6'l><'#createProduct.col-md-6 text-right'>>" +
         "<'row'<'#toolbar_buttons.col-md-8'B><'col-md-4'f>>"+
         "rtip",
     initComplete:function(){
-        $('#createProduct').html('<a href="'+app.host+'products/getProductsTable" target="_blank" type="button" class="btn btn-info btn-sm"><i class="fa fa-plus"></i> Məhsul Yarat</a>');
+        $('#createProduct').html('<a href="'+app.host+'products/create-product" target="_blank" type="button" class="btn btn-info btn-sm"><i class="fa fa-plus"></i> Məhsul Yarat</a>');
     },
     buttons: [
         {
@@ -150,7 +151,8 @@ var drawTable = $('#productsTable').DataTable( {
                     className:".dt-more-about-item",
                     action: function ( e, dt, node, config ) {
                         var get_row = drawTable.rows({ selected: true }).nodes();
-                        var productID = $(get_row[0]).data('product-id');
+                        var productID = $(get_row[0]).data('id');
+
                     }
                 },
                 {
@@ -158,7 +160,8 @@ var drawTable = $('#productsTable').DataTable( {
                     className:".dt-edit-item",
                     action: function ( e, dt, node, config ) {
                         var get_row = drawTable.rows({ selected: true }).nodes();
-                        var productID = $(get_row[0]).data('product-id');
+                        var productID = $(get_row[0]).data('id');
+                        window.location.href=app.host+"/products/update-product/"+productID;
                     }
                 },
                 {
@@ -166,7 +169,8 @@ var drawTable = $('#productsTable').DataTable( {
                     className:".dt-delete-item",
                     action: function ( e, dt, node, config ) {
                         var get_row = drawTable.rows({ selected: true }).nodes();
-                        var productID = $(get_row[0]).data('product-id');
+                        var productID = $(get_row[0]).data('id');
+                        removeData("products/delete/",productID);
                     }
                 }
             ],

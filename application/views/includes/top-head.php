@@ -3,7 +3,7 @@
     <div class="navbar-wrapper">
         <div class="navbar-header">
             <div class="navbar-brand">
-                <img class="brand-logo" alt="modern admin logo" src="app-assets/images/logo/main-logo.png">
+                <img class="brand-logo" alt="modern admin logo" src="<?php echo base_url("app-assets/images/logo/main-logo.png"); ?>">
             </div>
             <ul class="nav navbar-nav flex-row">
                 <li class="nav-item mobile-menu d-md-none mr-auto"><a class="nav-link nav-menu-main menu-toggle hidden-xs" href="#"><i class="ft-menu font-large-1"></i></a></li>
