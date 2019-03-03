@@ -58,3 +58,5 @@ $route['purchases/add-purchase'] = "purchases/new_form";
 $route['purchases/update-purchase/(.*)'] = "purchases/update_form/$1";
 $route['suppliers/add-supplier'] = "suppliers/new_form";
 $route['suppliers/update-supplier/(.*)'] = "suppliers/update_form/$1";
+$route['customers/add-customer'] = "customers/new_form";
+$route['customers/update-customer/(.*)'] = "customers/update_form/$1";

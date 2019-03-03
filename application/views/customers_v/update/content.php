@@ -22,7 +22,7 @@
                 <div class="card-content collapse show">
                     <div class="card-body card-dashboard">
                         <?php if($result): ?>
-                        <form class="form" method="post" action="<?php echo base_url("suppliers/update/{$items->ID}"); ?>">
+                        <form class="form" method="post" action="<?php echo base_url("customers/update/{$items->ID}"); ?>">
                             <div class="form-body">
                                 <div class="row">
 
@@ -49,10 +49,10 @@
 
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="supplier-name">Adı</label>
-                                            <input type="text" id="supplier-name" value="<?php echo $items->name; ?>" class="form-control border-primary" placeholder="Tədarkçü Adı" name="supplier-name">
+                                            <label for="customer-name">Adı</label>
+                                            <input type="text" id="customer-name" value="<?php echo $items->name; ?>" class="form-control border-primary" placeholder="Müştəri/Cari Adı" name="customer-name">
                                             <?php if(isset($form_error)): ?>
-                                                <span class="font-italic red font-weight-bold"><?php echo form_error('supplier-name'); ?></span>
+                                                <span class="font-italic red font-weight-bold"><?php echo form_error('customer-name'); ?></span>
                                             <?php endif; ?>
                                         </div>
                                     </div>
@@ -77,7 +77,7 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="telephone">Telefon</label>
-                                            <input type="text" value="<?php echo $items->telephone; ?>" id="telephone" class="form-control border-primary" placeholder="Telefon" name="telephone">
+                                            <input type="text"  value="<?php echo $items->telephone; ?>" id="telephone" class="form-control border-primary" placeholder="Telefon" name="telephone">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -130,7 +130,7 @@
 
                     </div>
                     <div class="form-actions text-center">
-                        <a href="<?php echo base_url('suppliers'); ?>" class="btn btn-warning mr-1">
+                        <a href="<?php echo base_url('customers'); ?>" class="btn btn-warning mr-1">
                             <i class="ft-x"></i> Ləğv Et
                         </a>
                         <button type="submit" class="btn btn-primary">
