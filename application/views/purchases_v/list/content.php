@@ -21,17 +21,16 @@
 
                 <div class="card-content collapse show">
                     <div class="card-body card-dashboard">
-                        <table id="pruchasesTable" class="table full-width display nowrap table-striped table-bordered scroll-horizontal-vertical base-style dtTable">
+                        <table id="purchasesTable" class="table full-width display nowrap table-striped table-bordered scroll-horizontal-vertical base-style dtTable">
                             <thead>
                             <tr>
                                 <th>#</th>
-                                <th>##</th>
                                 <th>Avto Kod</th>
                                 <th>Kodu</th>
-                                <th>Adı</th>
                                 <th>Anbar</th>
                                 <th>Firma/Müştəri</th>
                                 <th>Ümumi Qiymət</th>
+                                <th>Valyuta</th>
                                 <th>Tələbnamə &#8470</th>
                                 <th>Tarix</th>
                                 <th>Əməliyyatçı</th>
@@ -40,13 +39,12 @@
                             <tfoot>
                             <tr>
                                 <th>#</th>
-                                <th>##</th>
                                 <th>Avto Kod</th>
                                 <th>Kodu</th>
-                                <th>Adı</th>
                                 <th>Anbar</th>
                                 <th>Firma/Müştəri</th>
                                 <th>Ümumi Qiymət</th>
+                                <th>Valyuta</th>
                                 <th>Tələbnamə &#8470</th>
                                 <th>Tarix</th>
                                 <th>Əməliyyatçı</th>

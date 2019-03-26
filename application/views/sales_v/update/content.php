@@ -20,17 +20,17 @@
                 </div>
 
                 <div class="card-content collapse show">
+                    <?php if($result): ?>
                     <div class="card-body card-dashboard">
-                        <?php if($result): ?>
-                        <form class="form" method="post" action="<?php echo base_url("products/update/{$items->ID}"); ?>">
+                        <form class="form" method="post" action="<?php echo base_url("purchases/update/{$purchases->ID}"); ?>">
                             <div class="form-body">
-                                <h4 class="form-section"><i class="la la-cube"></i> Əsas Sahələr</h4>
+                                <h4 class="form-section"><i class="la la-paperclip"></i> Əsas Sahələr</h4>
                                 <div class="row">
 
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="auto-code">Avtomatik Kod</label>
-                                            <input type="text" readonly value="<?php echo $items->autoCode; ?>" id="auto-code"
+                                            <input type="text" required readonly value="<?php echo $purchases->autoCode; ?>" id="auto-code"
                                                    class="form-control border-primary" placeholder="Avtomatik Kod" name="auto-code">
                                             <?php if(isset($form_error)): ?>
                                                 <span class="font-italic red font-weight-bold"><?php echo form_error('auto-code'); ?></span>
@@ -41,38 +41,48 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="code">Kodu</label>
-                                            <input type="text" value="<?php echo $items->code; ?>" id="code" class="form-control border-primary" placeholder="Kodu" name="code">
+                                            <input type="text" required id="code" value="<?php echo $purchases->code; ?>" class="form-control border-primary" placeholder="Kodu" name="code">
                                             <?php if(isset($form_error)): ?>
-                                            <span class="font-italic red font-weight-bold"><?php echo form_error('code'); ?></span>
+                                                <span class="font-italic red font-weight-bold"><?php echo form_error('code'); ?></span>
                                             <?php endif; ?>
                                         </div>
                                     </div>
 
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="product-name">Adı</label>
-                                            <input value="<?php echo $items->title; ?>" type="text" id="product-name" class="form-control border-primary" placeholder="Adı" name="product-name">
-                                            <?php if(isset($form_error)): ?>
-                                                <span class="font-italic red font-weight-bold"><?php echo form_error('product-name'); ?></span>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="brand">Marka </label><span class="pull-right">+ Əlavə Et</span>
-                                            <select class="select2 form-control border-primary" name="brand" id="brand">
-                                                <option value="">Marka</option>
+                                            <label for="warehouse">Anbar </label><span class="pull-right">+ Əlavə Et</span>
+                                            <select disabled class="form-control border-primary" required name="warehouse-selectbox" id="warehouse-selectbox">
+                                                <option value="">Anbar</option>
                                                 <?php
-                                                foreach ($brands as $brand){ ?>
-                                                    <option <?php echo ($items->brandID==$brand->ID) ? "selected":"" ?> value="<?php echo $brand->ID; ?>">
-                                                        <?php echo $brand->name; ?>
+                                                foreach ($warehouses as $warehouse){ ?>
+                                                    <option <?php echo ($warehouse->ID == $purchases->warehouseID) ? "selected":""; ?>
+                                                            value="<?php echo $warehouse->ID; ?>">
+                                                        <?php echo $warehouse->name; ?>
                                                     </option>
                                                 <?php }
                                                 ?>
                                             </select>
+                                            <input type="hidden" readonly required id="warehouse" name="warehouse" value="<? echo $purchases->warehouseID; ?>">
                                             <?php if(isset($form_error)): ?>
-                                                <span class="font-italic red font-weight-bold"><?php echo form_error('brand'); ?></span>
+                                                <span class="font-italic red font-weight-bold"><?php echo form_error('warehouse'); ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="supplier">Tədarükçü Firma/Şəxs </label><span class="pull-right">+ Əlavə Et</span>
+                                            <select class="select2 form-control border-primary" required name="supplier" id="supplier">
+                                                <option value="">Tədarükçü Firma/Şəxs</option>
+                                                <?php
+                                                foreach ($suppliers as $supplier){
+                                                    $selected = ($supplier->ID == $purchases->supplierID) ?"selected":"";
+                                                    echo '<option '.$selected.' value="'.$supplier->ID.'">'.$supplier->name.'</option>';
+                                                }
+                                                ?>
+                                            </select>
+                                            <?php if(isset($form_error)): ?>
+                                                <span class="font-italic red font-weight-bold"><?php echo form_error('supplier'); ?></span>
                                             <?php endif; ?>
                                         </div>
                                     </div>
@@ -82,157 +92,247 @@
 
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="category">Kateqoriya</label>
-                                            <select class="select2 form-control border-primary" name="category" id="category">
-                                                <option value="">Kateqoriya</option>
+                                            <label for="billType">Əməliyyat Tipi</label>
+                                            <select class="select2 form-control border-primary" required name="billType" id="billType">
+                                                <option value="">Əməliyyat Tipi</option>
                                                 <?php
-                                                foreach ($categories as $category){ ?>
-                                                    <option <?php echo ($items->categoryID==$category->ID) ? "selected":"" ?> value="<?php echo $category->ID; ?>">
-                                                        <?php echo $category->name; ?>
-                                                    </option>
+                                                foreach ($billTypes as $billType){
+                                                    $selected = ($billType->ID == $purchases->billType) ?"selected":"";
+                                                    echo '<option '.$selected.' value="'.$billType->ID.'">'.$billType->name.'</option>';
+                                                }
+                                                ?>
+                                            </select>
+                                            <?php if(isset($form_error)): ?>
+                                                <span class="font-italic red font-weight-bold"><?php echo form_error('billType'); ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="currency">Məzənnə</label>
+                                            <select class="select2 form-control border-primary" required name="currency" id="currency">
+                                                <option value="">Məzənnə</option>
+                                                <?php
+                                                foreach ($currency as $curr){ ?>
+                                                    <option
+                                                        <?php echo ($curr->symbol==$purchases->currency) ? "selected":""; ?>
+                                                            value="<?php echo $curr->symbol; ?>">
+                                                        <?php echo $curr->name; ?> (<?php echo $curr->symbol; ?>)
+                                                    </option>';
                                                 <?php }
                                                 ?>
                                             </select>
-                                            <?php if(isset($form_error)): ?>
-                                                <span class="font-italic red font-weight-bold"><?php echo form_error('category'); ?></span>
-                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="projectinput4">Ölçü Vahidi</label>
-                                            <select class="select2 form-control border-primary" name="unit" id="unit">
-                                                <option value="">Ölçü Vahidi</option>
+                                            <label for="date">Redaktə Tarixi</label>
+                                            <?php $date = new DateTime($purchases->date);
+                                                  $date = $date->format('Y/m/d');
+                                            ?>
+                                            <input value="<?php echo $date; ?>" type="text" required id="date" class="form-control border-primary" placeholder="Tarix" name="date">
+                                            <?php if(isset($form_error)): ?>
+                                                <span class="font-italic red font-weight-bold"><?php echo form_error('date'); ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <fieldset class="form-group">
+                                            <label for="requisition">Tələbnamə &#8470</label>
+                                            <div class="input-group">
                                                 <?php
-                                                    foreach ($units as $unit){ ?>
-                                                        <option <?php echo ($items->unitID==$unit->ID) ? "selected":"" ?> value="<?php echo $unit->ID; ?>">
-                                                            <?php echo $unit->name.' ('.$unit->shortName.')'; ?>
-                                                        </option>
-                                                   <?php }
+
                                                 ?>
-                                            </select>
-                                            <?php if(isset($form_error)): ?>
-                                                <span class="font-italic red font-weight-bold"><?php echo form_error('unit'); ?></span>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="critic-amount">Kritik Stok Miqdarı</label>
-                                            <fieldset>
-                                                <div class="input-group">
-                                                    <input value="<?php echo $items->criticStockAmount; ?>" name="critic-amount" id="critic-amount" type="text" class="" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" />
+                                                <input type="text" class="form-control border-primary" id="search-requisition" name="search-requisition" value="<?php echo $purchases->rCode; ?>" />
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="ft-search"></i></span>
                                                 </div>
-                                            </fieldset>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="shelf-no">Rəf &#8470;</label>
-                                            <input value="<?php echo $items->shelfNo; ?>" type="text" id="shelf-no" class="form-control border-primary" placeholder="Rəf &#8470;" name="shelf-no">
-                                        </div>
+                                                <input type="hidden" class="form-control border-primary" value="<?php echo $purchases->requisitionID; ?>" id="requisition" name="requisition" />
+                                            </div>
+                                        </fieldset>
                                     </div>
 
                                 </div>
 
-                                <h4 class="form-section"><i class="la la-paperclip"></i> Digər</h4>
+                                <!--<h4 class="form-section"><i class="la la-cubes"></i>Məhsullar</h4>-->
 
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="cost">Alış Qiyməti</label>
-                                            <fieldset>
-                                                <div class="input-group">
-                                                    <input value="<?php echo $items->cost; ?>" name="cost" id="cost" type="text" class=" border-primary costs" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" />
-                                                </div>
-                                            </fieldset>
+                                <ul class="nav nav-tabs nav-linetriangle">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="baseIcon-tab31" data-toggle="tab" aria-controls="tabIcon31"
+                                           href="#tabIcon31" aria-expanded="true"><i class="la la-cubes"></i> Məhsullar</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="baseIcon-tab32" data-toggle="tab" aria-controls="tabIcon32"
+                                           href="#tabIcon32" aria-expanded="false"><i class="fa fa-info-circle"></i> Faktura Detalları</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="baseIcon-tab33" data-toggle="tab" aria-controls="tabIcon33"
+                                           href="#tabIcon33" aria-expanded="false"><i class="la la-pencil"></i> Qeyd</a>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content px-1 pt-1">
+                                    <div role="tabpanel" class="tab-pane active" id="tabIcon31" aria-expanded="true"
+                                         aria-labelledby="baseIcon-tab31">
+                                        <div class="row">
+
+                                            <div class="col-md-12">
+                                        <span class="pull-left">
+                                            <input type="hidden" readonly id="last-tr-id" value="<?php echo count($purchasesItems); ?>">
+                                            <input type="hidden" readonly id="focused-tr-id" value="1">
+                                        </span>
+                                                <span class="pull-right pb-1">
+                                            <button onclick="addNewRow()" type="button" class="btn btn-info btn-sm"><i class="fa fa-plus"></i> Əlavə Et</button>
+                                        </span>
+                                                <table id="added-items-list" class="table full-width table-responsive table-bordered">
+                                                    <thead>
+                                                    <tr>
+                                                        <th class="col-3">Kodu</th>
+                                                        <th class="col-5">Adı</th>
+                                                        <th class="col-1">Ölçü Vahidi</th>
+                                                        <th>Miqdarı</th>
+                                                        <th>Ədəd Qiyməti</th>
+                                                        <th>Endirim (<span class="currency-indicator"></span>) ilə</th>
+                                                        <th>Yekun Qiymət</th>
+                                                        <th class="col-1"></th>
+                                                    </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                    <?php for($i=0;$i<=count($purchasesItems)-1;$i++){ ?>
+                                                        <tr id="items-table-row-<?php echo $i+1; ?>">
+                                                        <td class="custom-product-td">
+                                                            <input type="text" required onfocus="addProduct(this)" name="product-code[]"  class="form-control custom-product-input mySearch product-code" value="<?php echo $purchasesItems[$i]->productCode; ?>">
+                                                            <input type="hidden" name="productID[]" class="productID" value="<?php echo $purchasesItems[$i]->productID; ?>">
+                                                        </td>
+                                                        <td class="custom-product-td">
+                                                            <input type="text" required name="product-name[]" readonly class="form-control custom-product-input" value="<?php echo $purchasesItems[$i]->productTitle; ?>">
+                                                        </td>
+                                                        <td class="custom-product-td">
+                                                            <select name="product-unit[]" required  class="form-control custom-product-select product-unit">
+                                                                <option value="">Ölçü Vahidi</option>
+                                                                <?php
+                                                                foreach ($units as $unit){ ?>
+                                                                   <option
+                                                                   <?php echo ($purchasesItems[$i]->productUnit==$unit->shortName)?"selected":""; ?>
+                                                                           value="<?php echo $unit->shortName;?>">
+                                                                       <?php echo $unit->name; ?>
+                                                                   </option>
+                                                               <?php }
+                                                                ?>
+                                                            </select>
+                                                        </td>
+                                                        <td class="custom-product-td">
+                                                            <fieldset>
+                                                                <div class="input-group">
+                                                                    <input onkeyup="calculateGrassTotal(this)" required type="text" name="product-quantity[]" type="text" class="form-control custom-product-input custom-touch-spin product-quantity general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo $purchasesItems[$i]->quantity; ?>" />
+                                                                </div>
+                                                            </fieldset>
+                                                        </td>
+                                                        <td class="custom-product-td">
+                                                            <fieldset>
+                                                                <div class="input-group">
+                                                                    <input onkeyup="calculateGrassTotal(this)" required type="text" name="product-price[]" type="text" class="form-control custom-product-input custom-touch-spin product-price general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo $purchasesItems[$i]->price; ?>" />
+                                                                </div>
+                                                            </fieldset>
+                                                        </td>
+                                                        <td class="custom-product-td">
+                                                            <fieldset>
+                                                                <div class="input-group">
+                                                                    <input type="text" onkeyup="applyDiscount(this)" name="product-discount[]" type="text" class="form-control custom-product-input custom-touch-spin product-discount general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo ($purchasesItems[$i]->discountValue!='0.00')?$purchasesItems[$i]->discountValue:"";  ?>" />
+                                                                </div>
+                                                            </fieldset>
+                                                        </td>
+                                                        <td class="custom-product-td">
+                                                            <input type="text" name="product-grassTotal[]" required readonly class="form-control custom-product-input product-grassTotal" value="<?php echo $purchasesItems[$i]->grassTotal; ?>" >
+                                                        </td>
+                                                        <td class="custom-product-td product-operation-td">
+                                                            <i onclick="removeRow(this)" data-belong-row-id="<?php echo $i+1;?>" class="fa fa-trash red"></i>
+                                                        </td>
+                                                    </tr>
+                                                    <?php } ?>
+                                                    </tbody>
+
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="price-1">Satış Qiyməti-1</label>
-                                            <fieldset>
-                                                <div class="input-group">
-                                                    <input value="<?php echo $items->price; ?>" name="price-1" id="price-1" type="text" class=" border-primary costs" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" />
+                                    <div class="tab-pane" id="tabIcon32" aria-labelledby="baseIcon-tab32">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="special-1">Xüsusi Sahə-1</label>
+                                                    <input value="<?php echo $purchases->special1; ?>" type="text" id="special-1" class="form-control border-primary" placeholder="Xüsusi Sahə-1" name="special-1">
                                                 </div>
-                                            </fieldset>
+
+                                                <div class="form-group">
+                                                    <label for="special-2">Xüsusi Sahə-2</label>
+                                                    <input value="<?php echo $purchases->special2; ?>" type="text" id="special-2" class="form-control border-primary" placeholder="Xüsusi Sahə-2" name="special-2">
+                                                </div>
+
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="price-2">Satış Qiyməti-2</label>
-                                            <fieldset>
-                                                <div class="input-group">
-                                                    <input value="<?php echo $items->price2; ?>" name="price-2" id="price-2" type="text" class=" border-primary costs" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" />
+                                    <div class="tab-pane" id="tabIcon33" aria-labelledby="baseIcon-tab33">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="note">Qeyd</label>
+                                                    <div class="position-relative has-icon-left">
+                                                        <textarea id="note" rows="5" class="form-control" name="note" placeholder="Qeyd"><?php echo $purchases->note; ?></textarea>
+                                                        <div class="form-control-position">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </fieldset>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="vat">ƏDV</label>
-                                            <fieldset>
-                                                <div class="input-group">
-                                                    <input value="<?php echo $items->VAT; ?>" name="vat" id="vat" type="text" class="border-primary" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" />
-                                                </div>
-                                            </fieldset>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="barcode-1">Barkod-1</label>
-                                            <input type="text" value="<?php echo $items->barcode; ?>" id="barcode-1" class="form-control border-primary" placeholder="Barkod-1" name="barcode-1">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="barcode-2">Barkod-2</label>
-                                            <input value="<?php echo $items->barcode2; ?>" type="text" id="barcode-2" class="form-control border-primary" placeholder="Barkod-2" name="barcode-2">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="changable-code">Dəyişən Kodu</label>
-                                            <input type="text" value="<?php echo $items->changableCode; ?>" id="changable-code" class="form-control border-primary" placeholder="Dəyişən Kodu" name="changable-code">
-                                        </div>
-                                    </div>
 
+                            </div>
+                            <hr/>
+                            <div class="row black">
+                                <div class="col-md-12 text-right">
+                                    <p><strong>Yekun:</strong></p>
+                                </div>
+                                <div class="col-md-12 text-right">
+                                    <p><strong>Cəm Məhsul Endirimi:</strong> <span id="totalProductDiscount">
+                                            <?php echo $purchases->totalProductDiscount; ?>
+                                        </span> <span class="currency-indicator">AZN</span></p>
+                                    <input value="<?php echo $purchases->totalProductDiscount; ?>" type="hidden" id="totalProductDiscount-input" required name="totalProductDiscount">
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="special-1">Xüsusi Sahə-1</label>
-                                            <input value="<?php echo $items->special1; ?>" type="text" id="special-1" class="form-control border-primary" placeholder="Xüsusi Sahə-1" name="special-1">
-                                        </div>
+                                <!--  GENERAL DISCOUNT START  -->
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4 text-right">
+                                    <div class="input-group">
+                                        <label class="mtp-5 black"><strong>Ümumi Endirim (<span class="currency-indicator">₼</span>) ilə:</strong></label>
+                                        <input type="text" onkeyup="calculateTotalDiscount()" name="generalDiscountValue" id="generalDiscountValue" type="text" class="form-control custom-product-input custom-touch-spin general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo ($purchases->generalDiscountValue!='0.00')?$purchases->generalDiscountValue:""; ?>" />
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="special-2">Xüsusi Sahə-2</label>
-                                            <input value="<?php echo $items->special2; ?>" type="text" id="special-2" class="form-control border-primary" placeholder="Xüsusi Sahə-2" name="special-2">
-                                        </div>
-                                    </div>
+                                </div>
+                                <!--     GENERAL DISCOUNT END   -->
 
+                                <div class="col-md-12 text-right mt-1">
+                                    <p><strong>Cəm Endirim:</strong> <span id="totalDiscount">
+                                            <?php echo $purchases->TotalDiscount; ?>
+                                        </span> <span class="currency-indicator">AZN</span></p>
+                                    <input  value="<?php echo $purchases->TotalDiscount; ?>" type="hidden" id="totalDiscount-input" required name="totalDiscount">
                                 </div>
 
-                                <div class="row">
-
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="description">Açıqlama</label>
-                                            <textarea id="description" rows="5" class="form-control" name="description" placeholder="Açıqlama"><?php echo $items->description; ?></textarea>
-                                        </div>
-                                    </div>
-
-
+                                <div class="col-md-12 text-right mt-1">
+                                    <p><strong>Yekun Qiymət:</strong> <span id="grandTotal">
+                                             <?php echo $purchases->total; ?>
+                                        </span> <span class="currency-indicator">AZN</span></p>
+                                    <input value="<?php echo $purchases->total; ?>" type="hidden" name="grandTotal" required id="grandTotal-input">
                                 </div>
 
                             </div>
+
                             <div class="form-actions text-center">
-                                <a href="<?php echo base_url('products'); ?>" class="btn btn-warning mr-1">
+                                <a href="<?php echo base_url('purchases'); ?>" class="btn btn-warning mr-1">
                                     <i class="ft-x"></i> Ləğv Et
                                 </a>
                                 <button type="submit" class="btn btn-primary">
@@ -240,12 +340,14 @@
                                 </button>
                             </div>
                         </form>
-                        <?php else:  ?>
-                        <h1>Məlumat Tapılmadı</h1>
-                        <?php endif; ?>
                     </div>
+                    <?php else: ?>
+                    <h1 class="red">Məlumat Tapılmadı</h1>
+                    <?php endif; ?>
                 </div>
+
             </div>
         </div>
     </div>
 </section>
+

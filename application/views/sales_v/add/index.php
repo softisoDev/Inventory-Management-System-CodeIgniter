@@ -4,8 +4,13 @@
 <head>
     <?php $this->load->view("includes/head"); ?>
     <?php $this->load->view("includes/main-style"); ?>
+    <?php $this->load->view("includes/dtStyle"); ?>
     <?php $this->load->view("{$viewFolder}/{$subViewFolder}/pageStyle"); ?>
-
+<style>
+    .ui-autocomplete-loading {
+        background: url('<?php echo base_url('app-assets');?>/images/icons/ajax-loader.gif') right center no-repeat;
+    }
+</style>
 </head>
 <body class="vertical-layout vertical-compact-menu 2-columns   menu-expanded fixed-navbar"
       data-open="click" data-menu="vertical-compact-menu" data-col="2-columns">
@@ -21,9 +26,11 @@
 
 
 <?php $this->load->view("includes/footer"); ?>
+
 <?php $this->load->view("includes/main-js"); ?>
 <?php $this->load->view("{$viewFolder}/{$subViewFolder}/pageScript"); ?>
-
+<?php $this->load->view("includes/dtScript"); ?>
 </body>
 </html>
 
+<?php $this->load->view("includes/modals/products"); ?>

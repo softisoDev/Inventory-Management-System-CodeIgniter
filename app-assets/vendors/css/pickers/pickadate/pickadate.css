@@ -321,3 +321,6 @@
 	cursor: default;
 	z-index: auto;
 }
+.picker__button--today, .picker__button--clear, .picker__button--close{
+	color:black !important;
+}

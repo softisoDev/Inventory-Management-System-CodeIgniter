@@ -2,7 +2,7 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Purchases_model extends CI_Model{
+class Sales_model extends CI_Model{
 
     public $tableName = "";
     public $prefix    = "";
@@ -10,19 +10,19 @@ class Purchases_model extends CI_Model{
     public function __construct()
     {
         parent::__construct();
-        $this->tableName = "purchases";
-        $this->prefix    = "MGF";
+        $this->tableName = "sales";
+        $this->prefix    = "MÇF";
     }
 
     public function getDataTable(){
 
         $this->load->library('datatables');
 
-        $this->datatables->select('purchases.ID, purchases.autoCode, purchases.code AS Pcode, warehouse.name AS Wname, suppliers.name AS Sname, purchases.total, purchases.currency, requisitions.code AS Rcode, purchases.date AS Pdate, purchases.userID as PUid');
+        $this->datatables->select('sales.ID, sales.autoCode, sales.code AS Pcode, warehouse.name AS Wname, customers.name AS Cname, sales.total, sales.currency, requisitions.code AS Rcode, sales.date AS Pdate, sales.userID as SUid');
         $this->datatables->from($this->tableName);
-        $this->datatables->join('warehouse', 'purchases.warehouseID=warehouse.ID', 'left');
-        $this->datatables->join('suppliers', 'purchases.supplierID=suppliers.ID', 'left');
-        $this->datatables->join('requisitions', 'purchases.requisitionID=requisitions.ID', 'left');
+        $this->datatables->join('warehouse', 'sales.warehouseID=warehouse.ID', 'left');
+        $this->datatables->join('customers', 'sales.customerID=customers.ID', 'left');
+        $this->datatables->join('requisitions', 'sales.requisitionID=requisitions.ID', 'left');
         return $this->datatables->generate('json');
     }
 

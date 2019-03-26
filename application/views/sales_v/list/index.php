@@ -21,6 +21,8 @@
 
 
 <?php $this->load->view("includes/footer"); ?>
+
+
 <?php $this->load->view("includes/main-js"); ?>
 <?php $this->load->view("includes/dtScript"); ?>
 <?php $this->load->view("{$viewFolder}/{$subViewFolder}/pageScript"); ?>

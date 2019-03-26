@@ -49,14 +49,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'welcome';
-$route['404_override'] = '';
-$route['translate_uri_dashes'] = FALSE;
-$route['products/create-product'] = "products/new_form";
-$route['products/update-product/(.*)'] = "products/update_form/$1";
-$route['purchases/add-purchase'] = "purchases/new_form";
+$route['default_controller']             = 'welcome';
+$route['404_override']                   = '';
+$route['translate_uri_dashes']           = FALSE;
+$route['products/create-product']        = "products/new_form";
+$route['products/update-product/(.*)']   = "products/update_form/$1";
+$route['purchases/add-purchase']         = "purchases/new_form";
 $route['purchases/update-purchase/(.*)'] = "purchases/update_form/$1";
-$route['suppliers/add-supplier'] = "suppliers/new_form";
+$route['suppliers/add-supplier']         = "suppliers/new_form";
 $route['suppliers/update-supplier/(.*)'] = "suppliers/update_form/$1";
-$route['customers/add-customer'] = "customers/new_form";
+$route['customers/add-customer']         = "customers/new_form";
 $route['customers/update-customer/(.*)'] = "customers/update_form/$1";
+$route['sales/add-sale']                 = "sales/new_form";
+$route['sales/update-sale/(.*)']         = "sales/update_form/$1";

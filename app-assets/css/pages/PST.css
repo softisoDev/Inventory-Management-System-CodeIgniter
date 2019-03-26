@@ -1,0 +1,24 @@
+.custom-product-input{
+    padding: 0.5rem 1rem !important;
+}
+.custom-product-select, .bootstrap-touchspin-down, .bootstrap-touchspin-up{
+    height: calc(2.25rem + 2px) !important;
+}
+.bootstrap-touchspin-down, .bootstrap-touchspin-up{
+    padding: 0rem 0.45rem !important;
+}
+.custom-product-td{
+    padding: 0 !important;
+}
+.custom-touch-spin{
+    font-size: 13px !important;
+}
+.product-operation-td{
+    vertical-align: middle !important;
+    text-align: center !important;
+    cursor: pointer;
+}
+
+.mtp-5{
+    margin-top: 5px !important;
+}

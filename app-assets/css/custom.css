@@ -102,7 +102,10 @@
     html body .pace .pace-progress{
         background: #f15d22 !important;
     }
-
     .select2 {
         width:100%!important;
+    }
+    .modal-full-width{
+        max-width: 95% !important;
+        width: 95% !important;
     }

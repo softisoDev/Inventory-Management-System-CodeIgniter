@@ -1,4 +1,4 @@
-var drawTable = $('#productsTable').DataTable( {
+var drawTable = $('#salesTable').DataTable( {
     "language": {
         "url": app.host+"app-assets/vendors/js/tables/datatable/locale/Azerbaijan.json",
         buttons: {
@@ -10,43 +10,37 @@ var drawTable = $('#productsTable').DataTable( {
         }
     },
     "order": [[ 0, "desc" ]],
+
     columnDefs:[
-        {
-            "targets":[0,20,18,16,17],
-            visible: false
-        },
         {
             "targets":[0],
             orderable: false,
             "className": "text-center"
         },
         {
-            "targets":[0,7,8,9,10,13,16,17,18,19,20,21,22],
+            "targets":[0,6],
+            visible: false
+        },
+
+        {
+            "targets":[0,5,6,7,8],
             searchable:false
         },
         {
-            "targets":[19],
-            "className": "text-center",
-            "width":"10px",
+            "targets":[5],
             "data": function ( row, type, val, meta ) {
-                if(type==='display'){
-                    var val = row[19]==1 ? "checked" : "unchecked";
-                }
-                var dataID = row[0];
-                var columnData = '<input type="checkbox" data-url="products/isActiveSetter/'+dataID+'" class="js-switch" '+val+' data-size="xs"/><label for="changeDataStatus" class="font-medium-2 text-bold-600 ml-1"></label>';
-                return columnData;
+                return row[5]+' '+row[6];
             }
         }
     ],
+
     "fnDrawCallback": function() {
         drawTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
             var singleRow = this.node();
             dataID = drawTable.row(singleRow).data()[0];
             $(singleRow).attr('data-id', dataID);
         });
-        $('.js-switch').each(function () {
-            new Switchery($(this)[0], { size: 'xsmall',className:"switchery switchery-xsmall" });
-        });
+
     },
     "lengthMenu":[10, 15, 25, 50,100, "Hamısı"],
     "scrollY": "50vh",
@@ -55,16 +49,17 @@ var drawTable = $('#productsTable').DataTable( {
     "processing": true,
     "serverSide": true,
     "ajax": {
-        url: app.host+"products/getProductsTable",
+        url: app.host+"sales/getDataTable",
         type:"POST"
     },
-    dom: "<'row'<'col-md-6'l><'#createProduct.col-md-6 text-right'>>" +
+    dom: "<'row'<'col-md-6'l><'#addsale.col-md-6 text-right'>>" +
         "<'row'<'#toolbar_buttons.col-md-8'B><'col-md-4'f>>"+
         "rtip",
     initComplete:function(){
-        $('#createProduct').html('<a href="'+app.host+'products/create-product" target="_blank" type="button" class="btn btn-info btn-sm"><i class="fa fa-plus"></i> Məhsul Yarat</a>');
+        $('#addsale').html('<a href="'+app.host+'sales/add-sale" target="_blank" type="button" class="btn btn-info btn-sm"><i class="fa fa-plus"></i> Faktura Yarat</a>');
     },
     buttons: [
+        /*
         {
             extend:'collection',
             text:'<i class="la la-copy"></i>Kopyala',
@@ -129,6 +124,7 @@ var drawTable = $('#productsTable').DataTable( {
                 columns: ':visible'
             }
         },
+        */
         {
             extend: 'colvis',
             text:   "Sütunlar",
@@ -151,7 +147,7 @@ var drawTable = $('#productsTable').DataTable( {
                     className:".dt-more-about-item",
                     action: function ( e, dt, node, config ) {
                         var get_row = drawTable.rows({ selected: true }).nodes();
-                        var productID = $(get_row[0]).data('id');
+                        var dataID = $(get_row[0]).data('id');
 
                     }
                 },
@@ -160,8 +156,8 @@ var drawTable = $('#productsTable').DataTable( {
                     className:".dt-edit-item",
                     action: function ( e, dt, node, config ) {
                         var get_row = drawTable.rows({ selected: true }).nodes();
-                        var productID = $(get_row[0]).data('id');
-                        window.location.href=app.host+"/products/update-product/"+productID;
+                        var dataID = $(get_row[0]).data('id');
+                        window.location.href=app.host+"sales/update-sale/"+dataID;
                     }
                 },
                 {
@@ -169,14 +165,15 @@ var drawTable = $('#productsTable').DataTable( {
                     className:".dt-delete-item",
                     action: function ( e, dt, node, config ) {
                         var get_row = drawTable.rows({ selected: true }).nodes();
-                        var productID = $(get_row[0]).data('id');
-                        removeData("products/delete/",productID);
+                        var dataID = $(get_row[0]).data('id');
+                        removeData("sales/delete/",dataID);
                     }
                 }
             ],
         },
     ],
     select: true
+
 });
 
 drawTable.on( 'select', function ( e, dt, type, indexes ) {

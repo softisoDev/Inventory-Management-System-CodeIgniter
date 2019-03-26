@@ -27,27 +27,13 @@
                                 <th>#</th>
                                 <th>Avto Kod</th>
                                 <th>Kodu</th>
-                                <th>Adı</th>
-                                <th>Marka</th>
-                                <th>Kateqoriya</th>
-                                <th>Ölçü Vahidi</th>
-                                <th>Qiyməti</th>
-                                <th>Satış Qiyməti</th>
-                                <th>Satış Qiyməti-2</th>
-                                <th>ƏDV</th>
-                                <th>Barkod</th>
-                                <th>Barkod-2</th>
-                                <th>Stok Miqdarı</th>
-                                <th>Kritik Stok Miqdarı</th>
-                                <th>Rəf No</th>
-                                <th>Yaradılma Tarixi</th>
-                                <th>Xüsusi Sahə-1</th>
-                                <th>Xüsusi Sahə-2</th>
-                                <th>Status</th>
-                                <th>Son Redaktə Olunma Tarixi</th>
-                                <th>Açıqlama</th>
-                                <th>Dəyişən Kodu</th>
-
+                                <th>Anbar</th>
+                                <th>Firma/Müştəri</th>
+                                <th>Ümumi Qiymət</th>
+                                <th>Valyuta</th>
+                                <th>Tələbnamə &#8470</th>
+                                <th>Tarix</th>
+                                <th>Əməliyyatçı</th>
                             </tr>
                             </thead>
                             <tfoot>
@@ -55,27 +41,13 @@
                                 <th>#</th>
                                 <th>Avto Kod</th>
                                 <th>Kodu</th>
-                                <th>Adı</th>
-                                <th>Marka</th>
-                                <th>Kateqoriya</th>
-                                <th>Ölçü Vahidi</th>
-                                <th>Qiyməti</th>
-                                <th>Satış Qiyməti</th>
-                                <th>Satış Qiyməti-2</th>
-                                <th>ƏDV</th>
-                                <th>Barkod</th>
-                                <th>Barkod-2</th>
-                                <th>Stok Miqdarı</th>
-                                <th>Kritik Stok Miqdarı</th>
-                                <th>Rəf No</th>
-                                <th>Yaradılma Tarixi</th>
-                                <th>Xüsusi Sahə-1</th>
-                                <th>Xüsusi Sahə-2</th>
-                                <th>Status</th>
-                                <th>Son Redaktə Olunma Tarixi</th>
-                                <th>Açıqlama</th>
-                                <th>Dəyişən Kodu</th>
-
+                                <th>Anbar</th>
+                                <th>Firma/Müştəri</th>
+                                <th>Ümumi Qiymət</th>
+                                <th>Valyuta</th>
+                                <th>Tələbnamə &#8470</th>
+                                <th>Tarix</th>
+                                <th>Əməliyyatçı</th>
                             </tr>
                             </tfoot>
                         </table>

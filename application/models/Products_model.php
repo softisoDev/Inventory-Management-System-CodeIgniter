@@ -13,17 +13,23 @@ class Products_model extends CI_Model{
         $this->prefix    = "PR";
     }
 
-    public function getDataTable(){
+    public function getDataTable($where = array()){
 
         $this->load->library('datatables');
 
-        $this->datatables->select('products.ID, autoCode, code, title, brands.name AS brandName, categories.name AS categoryName, units.shortName, cost, price, price2,  VAT, barcode, barcode2, stockAmount, criticStockAmount, shelfNo, products.createdAt,  special1, special2, products.isActive AS productStatus, products.updatedAt, products.description, changableCode');
+        $this->datatables->select('products.ID, autoCode, code, title, brands.name AS brandName, categories.name AS categoryName, units.shortName, cost, price, price2,  VAT, barcode, barcode2, stockAmount, criticStockAmount, shelfNo, products.createdAt, special1, special2, products.isActive AS productStatus, products.updatedAt, products.description, changableCode');
         $this->datatables->from('products');
         $this->datatables->join('categories', 'products.categoryID=categories.ID', 'left');
         $this->datatables->join('brands', 'products.brandID=brands.ID', 'left');
         $this->datatables->join('units', 'products.unitID=units.ID', 'left');
+        if(!empty($where)):
+            $this->datatables->join('warehouse_products', 'products.ID=warehouse_products.productID', 'INNER');
+            $this->datatables->join('warehouse', 'warehouse.ID=warehouse_products.warehouseID', 'INNER');
+        endif;
+        $this->datatables->where($where);
         return $this->datatables->generate('json');
     }
+
 
     public function generate_autoCode(){
         $this->load->helper('tools_helper');

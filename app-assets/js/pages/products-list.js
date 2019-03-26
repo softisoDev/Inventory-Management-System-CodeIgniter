@@ -151,7 +151,7 @@ var drawTable = $('#productsTable').DataTable( {
                     className:".dt-more-about-item",
                     action: function ( e, dt, node, config ) {
                         var get_row = drawTable.rows({ selected: true }).nodes();
-                        var productID = $(get_row[0]).data('id');
+                        var dataID = $(get_row[0]).data('id');
 
                     }
                 },
@@ -160,8 +160,8 @@ var drawTable = $('#productsTable').DataTable( {
                     className:".dt-edit-item",
                     action: function ( e, dt, node, config ) {
                         var get_row = drawTable.rows({ selected: true }).nodes();
-                        var productID = $(get_row[0]).data('id');
-                        window.location.href=app.host+"/products/update-product/"+productID;
+                        var dataID = $(get_row[0]).data('id');
+                        window.location.href=app.host+"/products/update-product/"+dataID;
                     }
                 },
                 {
@@ -169,8 +169,8 @@ var drawTable = $('#productsTable').DataTable( {
                     className:".dt-delete-item",
                     action: function ( e, dt, node, config ) {
                         var get_row = drawTable.rows({ selected: true }).nodes();
-                        var productID = $(get_row[0]).data('id');
-                        removeData("products/delete/",productID);
+                        var dataID = $(get_row[0]).data('id');
+                        removeData("products/delete/",dataID);
                     }
                 }
             ],

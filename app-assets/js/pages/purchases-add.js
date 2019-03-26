@@ -1,35 +1,26 @@
-$(document).ready(function () {
-    $(".select2").each(function () {
-        $(this).select2({
-            language:{
-                noResults:function(){return "Nəticə yoxdur"}
-            }
-        });
-    });
+function addProduct(e) {
+    var focusedTrID = $(e).closest('tr').attr('id');
+    focusedTrID     = focusedTrID.match(/\d+$/);
+    focusedTrID     = parseInt(focusedTrID[0]);
+    $('#focused-tr-id').val(focusedTrID);
+    reInitProductsTable();
+    $('#myModal').modal('show');
+}
 
-    $("#vat").TouchSpin({
-        min: 0,
-        max: 100,
-        step: 0.5,
-        decimals: 2,
-        boostat: 5,
-        maxboostedstep: 10,
-        postfix: '%'
-    });
-    $(".costs").TouchSpin({
-        min: 0,
-        step: 0.01,
-        decimals: 2,
-        boostat: 5,
-        maxboostedstep: 10,
-        postfix: 'AZN'
-    });
+function addNewRow() {
 
-    $("#critic-amount").TouchSpin({
-        min: 0,
-        step: 1,
-        boostat: 5,
-        maxboostedstep: 10,
+    var lastTrID    = $('#added-items-list tbody').find('tr:last').attr('id');
+    var lastNum     = lastTrID.match(/\d+$/);
+    lastNum         = parseInt(lastNum[0]);
+    lastNum         += 1;
+    $('#last-tr-id').val(lastNum);
+    $.ajax({
+        url:app.host+"/purchases/add_table_row/",
+        type:"POST",
+        data:{newRowID:lastNum},
+        success:function (data) {
+            $('#added-items-list tbody:last').append(data);
+            initTouchSpin();
+        }
     });
-
-});
+}

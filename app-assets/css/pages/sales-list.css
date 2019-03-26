@@ -1,0 +1,15 @@
+#salesTable_processing.card{
+    min-width: 0 !important;
+}
+.dtTable tbody tr td{
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    color: black !important;
+    vertical-align: middle !important;
+}
+.actions-buttons{
+    padding: 0rem 0.75rem !important;
+    /*padding-left: 0 !important;*/
+}

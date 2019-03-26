@@ -274,9 +274,20 @@ class Products extends CI_Controller {
         }
     }
 
+
     public function getDataTable(){
-        echo $this->products_model->getDataTable();
+        $where = array();
+
+        if($this->uri->segment(3)){
+            $where = array(
+                "warehouseID"   =>$this->uri->segment(3),
+                "stockAmount >" =>0.00
+            );
+        }
+
+        echo $this->products_model->getDataTable($where);
     }
+
 
 
 
