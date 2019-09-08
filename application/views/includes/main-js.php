@@ -39,11 +39,11 @@ if($alert): ?>
 <!--  END CUSTOM JS  -->
 
 <!--  BEGIN SKYCONS  -->
-<script src="https://rawgithub.com/darkskyapp/skycons/master/skycons.js"></script>
+<!--<script src="https://rawgithub.com/darkskyapp/skycons/master/skycons.js"></script>
 
 <script type="text/javascript">
     var icons = new Skycons({"color": "white"});
     icons.set("clear-day", Skycons.CLEAR_DAY);
     icons.play();
-</script>
+</script>-->
 <!--  END SKYCONS  -->

@@ -71,7 +71,7 @@
                                                 <option value="">Tədarükçü Firma/Şəxs</option>
                                                 <?php
                                                 foreach ($suppliers as $supplier){
-                                                    echo '<option value="'.$supplier->ID.'">'.$supplier->name.'</option>';
+                                                    echo '<option value="'.$supplier->ID.'">'.$supplier->fullName.'</option>';
                                                 }
                                                 ?>
                                             </select>
@@ -168,6 +168,11 @@
                                             <input type="hidden" readonly id="focused-tr-id" value="1">
                                         </span>
                                                 <span class="pull-right pb-1">
+
+                                            <label class="btn btn-info btn-sm mt-6px"><i class="fa fa-file"></i> Import from CSV
+                			           	 		<input onChange="importFromCsv(this);" style="display:none;" 	type="file" name="csvFile" accept=".csv">
+                			            	</label>
+
                                             <button onclick="addNewRow()" type="button" class="btn btn-info btn-sm"><i class="fa fa-plus"></i> Əlavə Et</button>
                                         </span>
                                                 <table id="added-items-list" class="table full-width table-responsive table-bordered">
@@ -184,11 +189,12 @@
                                                     </tr>
                                                     </thead>
 
-                                                    <tbody>
+                                                    <tbody id="product-list-content">
                                                     <tr id="items-table-row-1">
                                                         <td class="custom-product-td">
                                                             <input type="text" required onfocus="addProduct(this)" name="product-code[]"  class="form-control custom-product-input mySearch product-code">
                                                             <input type="hidden" name="productID[]" class="productID">
+                                                            <!--<input type="hidden" name="productWarehouse[]" class="productWarehouse">-->
                                                         </td>
                                                         <td class="custom-product-td">
                                                             <input type="text" required name="product-name[]" readonly class="form-control custom-product-input">
@@ -198,7 +204,7 @@
                                                                 <option value="">Ölçü Vahidi</option>
                                                                 <?php
                                                                 foreach ($units as $unit){
-                                                                    echo '<option value="'.$unit->shortName.'">'.$unit->name.'</option>';
+                                                                    echo '<option value="'.$unit->name.'">'.$unit->name.'</option>';
                                                                 }
                                                                 ?>
                                                                 ?>

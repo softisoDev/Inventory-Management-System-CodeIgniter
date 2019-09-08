@@ -12,6 +12,18 @@ class Units_model extends CI_Model{
         $this->tableName = "units";
     }
 
+    public function getDataTable($where=array()){
+
+        $this->load->library('datatables');
+
+        $this->datatables->select('ID, name, shortName');
+        $this->datatables->from($this->tableName);
+
+        $this->datatables->where($where);
+
+        return $this->datatables->generate('json');
+    }
+
     public function get($where = array())
     {
         return $this->db->where($where)->get($this->tableName)->row();

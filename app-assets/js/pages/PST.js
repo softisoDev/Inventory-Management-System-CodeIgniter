@@ -11,6 +11,7 @@ $(document).on('change','#currency',function () {
 });
 
 $(document).ready(function () {
+
     $(".select2").each(function () {
         $(this).select2({
             language:{
@@ -144,6 +145,8 @@ function calculateGrassTotal(e) {
             price           = parseFloat(price).toFixed(2);
             grassTotal      = (quantity*price).toFixed(2);
             $(e).closest('td').next().next().next().find('input.product-grassTotal').val(grassTotal);
+            calculateTotalDiscount();
+            calculateGrandTotal();
 
             break;
     }
@@ -231,11 +234,12 @@ function calculateGrandTotal() {
 }
 
 function calculateVAT(e) {
+
     calculateGrandTotal();
-    var grandTotal = $('#grandTotal-input').val();
-    var vatValue   = $(e).val();
+    let grandTotal = $('#grandTotal-input').val();
+    let vatValue   = $(e).val();
     if(vatValue == ""){vatValue=0.00}
-    var totalVAT   = 0.00;
+    let totalVAT   = 0.00;
 
     grandTotal     = parseFloat(grandTotal).toFixed(2);
     vatValue       = parseFloat(vatValue).toFixed(2);
@@ -243,5 +247,11 @@ function calculateVAT(e) {
     totalVAT       = (vatValue*grandTotal)/100;
     totalVAT       = parseFloat(totalVAT).toFixed(2);
 
+    grandTotal = (parseFloat(totalVAT)+parseFloat(grandTotal)).toFixed(2);
+
+
     $('#totalVAT').val(totalVAT);
+    $('#grandTotal-input').val(grandTotal);
+    $('#grandTotal').html(grandTotal);
+
 }

@@ -51,8 +51,8 @@ var drawTable = $('#suppliersTable').DataTable( {
         });
     },
 
-    "lengthMenu":[10, 15, 25, 50,100, "Hamısı"],
-    "scrollY": "50vh",
+    "lengthMenu":[[10, 15, 25, 50,100, -1],[10, 15, 25, 50,100, "Hamısı"]],
+    "scrollY": "100vh",
     "scrollX": true,
     "pageLength": 10,
     "processing": true,

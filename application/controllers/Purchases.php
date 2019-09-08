@@ -2,6 +2,10 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
 
 class Purchases extends CI_Controller{
 
@@ -12,15 +16,18 @@ class Purchases extends CI_Controller{
     public function __construct()
     {
         parent::__construct();
+        if(!get_active_user()){
+            redirect(base_url("login"));
+        }
         $this->viewFolder   = "purchases_v";
         $this->pageTitle    = "Məhsullar";
         $this->pageTitleExt = PageTitleExt;
-        $this->load->model('purchases_model');
-        $this->load->model('purchases_items_model');
+        $this->load->model('item_slips_model');
+        $this->load->model('item_handlings_model');
         $this->load->model('warehouse_products_model');
         $this->load->model('bill_Types_model');
         $this->load->model('warehouse_model');
-        $this->load->model('suppliers_model');
+        $this->load->model('persons_model');
         $this->load->model('requisitions_model');
         $this->load->model('currency_model');
         $this->load->model('units_model');
@@ -43,9 +50,9 @@ class Purchases extends CI_Controller{
         $viewData->subViewFolder    = "add";
         $viewData->pageTitle        = "Giriş Fakturası Yarat".$this->pageTitleExt;
         $viewData->header           = "Giriş Fakturası Yarat";
-        $viewData->newCode          = $this->purchases_model->generate_autoCode();
+        $viewData->newCode          = $this->item_slips_model->generate_autoCode('IPS');
         $viewData->warehouses       = $this->warehouse_model->getAll();
-        $viewData->suppliers        = $this->suppliers_model->getAll();
+        $viewData->suppliers        = $this->persons_model->getAll(array("personType"=>"supplier"));
         $viewData->requisitions     = $this->requisitions_model->getAll();
         $viewData->currency         = $this->currency_model->getAll();
         $viewData->billTypes        = $this->bill_Types_model->getAll(array("type"=>"purchase"));
@@ -89,11 +96,12 @@ class Purchases extends CI_Controller{
 
         if($checkValidation){
 
-            $savePurchase = $this->purchases_model->add(array(
+            $savePurchase = $this->item_slips_model->add(array(
                 "autoCode"          => $this->input->post("auto-code"),
                 "code"              => $this->input->post("code"),
-                "warehouseID"       => $this->input->post("warehouse"),
-                "supplierID"        => $this->input->post("supplier"),
+                "personID"          => $this->input->post("supplier"),
+                "warehouseTo"       => $this->input->post("warehouse"),
+                "slipType"          => 'purchase',
                 "billType "         => $this->input->post("billType"),
                 "generalDiscountValue" => $this->input->post("generalDiscountValue"),
                 "generalDiscount"   => $this->input->post("generalDiscountValue"),
@@ -116,9 +124,11 @@ class Purchases extends CI_Controller{
                 $savePurchaseProducts = false;
 
                 for($i=0;$i<count($this->input->post('productID[]'));$i++){
-                    $savePurchaseProducts = $this->purchases_items_model->add(array(
+                    $savePurchaseProducts = $this->item_handlings_model->add(array(
 
-                        "purchaseID"    => $lastInsertId,
+                        "slipID"        => $lastInsertId,
+                        "slipType"      => 'purchase',
+                        "warehouseTo"   => $this->input->post("warehouse"),
                         "productID"     => $this->input->post("productID[]")[$i],
                         "productCode"   => $this->input->post("product-code[]")[$i],
                         "productTitle"  => $this->input->post("product-name[]")[$i],
@@ -133,10 +143,12 @@ class Purchases extends CI_Controller{
                     ));
 
                         $this->warehouse_products_model->addInAmount(
-                        $this->input->post("productID[]")[$i],
-                        $this->input->post("warehouse"),
-                        $this->input->post("product-quantity[]")[$i]
+                            $this->input->post("productID[]")[$i],
+                            $this->input->post("warehouse"),
+                            $this->input->post("product-quantity[]")[$i]
                         );
+                    /* Check product for notification */
+                    checkProductForNotification($this->input->post("productID[]")[$i], $this->input->post("warehouse"));
                 }
 
                 if($savePurchaseProducts){
@@ -179,9 +191,9 @@ class Purchases extends CI_Controller{
             $viewData->subViewFolder    = "add";
             $viewData->pageTitle        = "Giriş Fakturası Yarat".$this->pageTitleExt;
             $viewData->header           = "Giriş Fakturası Yarat";
-            $viewData->newCode          = $this->purchases_model->generate_autoCode();
+            $viewData->newCode          = $this->item_slips_model->generate_autoCode('IPS');
             $viewData->warehouses       = $this->warehouse_model->getAll();
-            $viewData->suppliers        = $this->suppliers_model->getAll();
+            $viewData->suppliers        = $this->persons_model->getAll(array("personType"=>"supplier"));
             $viewData->requisitions     = $this->requisitions_model->getAll();
             $viewData->currency         = $this->currency_model->getAll();
             $viewData->billTypes        = $this->bill_Types_model->getAll(array("type"=>"purchase"));
@@ -200,31 +212,31 @@ class Purchases extends CI_Controller{
         $viewData->pageTitle        = "Giriş Fakturası Redaktə Et".$this->pageTitleExt;
         $viewData->header           = "Giriş Fakturası Redaktə Et";
         $viewData->warehouses       = $this->warehouse_model->getAll();
-        $viewData->suppliers        = $this->suppliers_model->getAll();
+        $viewData->suppliers        = $this->persons_model->getAll(array("personType"=>"supplier"));
         $viewData->requisitions     = $this->requisitions_model->getAll();
         $viewData->currency         = $this->currency_model->getAll();
         $viewData->billTypes        = $this->bill_Types_model->getAll(array("type"=>"purchase"));
         $viewData->units            = $this->units_model->getAll();
-        $viewData->purchases        = $this->purchases_model->get(
+        $viewData->purchases        = $this->item_slips_model->get(
             array(
-                "purchases.ID" => $id
+                "item_slips.ID" => $id
             ),
-            array('purchases.*',
+            array('item_slips.*',
                 'requisitions.ID AS RID',
                 'requisitions.code AS rCode'
             ),
             array(
                 array(
                     "tableName"   =>'requisitions',
-                    "joinColumns" =>'requisitions.ID=purchases.requisitionID',
+                    "joinColumns" =>'requisitions.ID=item_slips.requisitionID',
                     "type"        =>"LEFT"
                 )
             )
         );
 
-        $viewData->purchasesItems   = $this->purchases_items_model->getAll(
+        $viewData->purchasesItems   = $this->item_handlings_model->getAll(
             array(
-            "purchaseID" => $id
+            "slipID" => $id
         ));
 
         if(!$viewData->purchases || !$viewData->purchasesItems):
@@ -241,7 +253,6 @@ class Purchases extends CI_Controller{
 
         $this->form_validation->set_rules("auto-code","Avto Kod","required|trim");
         $this->form_validation->set_rules("code","Kod","required|trim");
-        $this->form_validation->set_rules("warehouse","Anbar","required|trim");
         $this->form_validation->set_rules("supplier","Tədarükçü","required|trim");
         $this->form_validation->set_rules("billType","Əməliyyat Tipi","required|trim");
         $this->form_validation->set_rules("currency","Məzənnə","required|trim");
@@ -270,16 +281,16 @@ class Purchases extends CI_Controller{
         $checkValidation = $this->form_validation->run();
 
         if($checkValidation){
-            $oldItems = $this->purchases_items_model->getAll(
+            $oldItems = $this->item_handlings_model->getAll(
                 array(
-                    "purchaseID" => $id
+                    "slipID" => $id
                 ));
             $decreaseAmountCheck = array();
 
             for ($i=0;$i<count($oldItems);$i++) {
                 if ($this->warehouse_products_model->decreaseAmount(
                     $oldItems[$i]->productID,
-                    $this->input->post("warehouse"),
+                    $oldItems[$i]->warehouseTo,
                     $oldItems[$i]->quantity
                 )){
                     $decreaseAmountCheck[] = true;
@@ -291,19 +302,19 @@ class Purchases extends CI_Controller{
 
             if(!is_array(false,$decreaseAmountCheck)){
 
-                $deleteOldData = $this->purchases_items_model->delete(
+                $deleteOldData = $this->item_handlings_model->delete(
                   array(
-                   "purchaseID" => $id
+                   "slipID" => $id
                   ));
                 if($deleteOldData){
-                    $updatePurchase = $this->purchases_model->update(
+                    $updatePurchase = $this->item_slips_model->update(
                         array(
                             "ID"    => $id
                         ),
                         array(
                             "code"              => $this->input->post("code"),
-                            "supplierID"        => $this->input->post("supplier"),
-                            "billType "         => $this->input->post("billType"),
+                            "personID"          => $this->input->post("supplier"),
+                            "billType"          => $this->input->post("billType"),
                             "generalDiscountValue" => $this->input->post("generalDiscountValue"),
                             "generalDiscount"   => $this->input->post("generalDiscountValue"),
                             "totalProductDiscount" => $this->input->post("totalProductDiscount"),
@@ -322,10 +333,11 @@ class Purchases extends CI_Controller{
                     if($updatePurchase){
                         $savePurchaseProducts = false;
                         for($i=0;$i<count($this->input->post('productID[]'));$i++){
-                            $savePurchaseProducts = $this->purchases_items_model->add(array(
+                            $savePurchaseProducts = $this->item_handlings_model->add(array(
 
-                                "purchaseID"    => $id,
+                                "slipID"    => $id,
                                 "productID"     => $this->input->post("productID[]")[$i],
+                                "warehouseTo"   => $this->input->post("warehouse"),
                                 "productCode"   => $this->input->post("product-code[]")[$i],
                                 "productTitle"  => $this->input->post("product-name[]")[$i],
                                 "productUnit"   => $this->input->post("product-unit[]")[$i],
@@ -343,6 +355,9 @@ class Purchases extends CI_Controller{
                                 $this->input->post("warehouse"),
                                 $this->input->post("product-quantity[]")[$i]
                             );
+
+                            /* Check product for notification */
+                            checkProductForNotification($this->input->post("productID[]")[$i], $this->input->post("warehouse"));
                         }
 
                         if($savePurchaseProducts){
@@ -406,30 +421,30 @@ class Purchases extends CI_Controller{
             $viewData->pageTitle        = "Giriş Fakturası Redaktə Et".$this->pageTitleExt;
             $viewData->header           = "Giriş Fakturası Redaktə Et";
             $viewData->warehouses       = $this->warehouse_model->getAll();
-            $viewData->suppliers        = $this->suppliers_model->getAll();
+            $viewData->suppliers        = $this->persons_model->getAll(array("personType"=>"supplier"));
             $viewData->requisitions     = $this->requisitions_model->getAll();
             $viewData->currency         = $this->currency_model->getAll();
             $viewData->billTypes        = $this->bill_Types_model->getAll(array("type"=>"purchase"));
             $viewData->units            = $this->units_model->getAll();
-            $viewData->purchases        = $this->purchases_model->get(
+            $viewData->purchases        = $this->item_slips_model->get(
                 array(
-                    "purchases.ID" => $id
+                    "item_slips.ID" => $id
                 ),
-                array('purchases.*',
+                array('item_slips.*',
                     'requisitions.ID AS RID',
                     'requisitions.code AS rCode'
                 ),
                 array(
                     array(
                         "tableName"   =>'requisitions',
-                        "joinColumns" =>'requisitions.ID=purchases.requisitionID',
+                        "joinColumns" =>'requisitions.ID=item_slips.requisitionID',
                         "type"        =>"LEFT"
                     )
                 )
             );
-            $viewData->purchasesItems   = $this->purchases_items_model->getAll(
+            $viewData->purchasesItems   = $this->item_handlings_model->getAll(
                 array(
-                    "purchaseID" => $id
+                    "slipID" => $id
                 ));
             if(!$viewData->purchases || !$viewData->purchasesItems):
                 $viewData->result   = false;
@@ -443,23 +458,19 @@ class Purchases extends CI_Controller{
     }
 
     public function delete($id){
-        $oldItems = $this->purchases_items_model->getAll(
+        $oldItems = $this->item_handlings_model->getAll(
             array(
-                "purchaseID" => $id
+                "slipID" => $id
             ));
-        $fetchPurchase = $this->purchases_model->get(array(
-            "ID"    => $id
-        ));
-        $warehousID = $fetchPurchase->warehouseID;
 
         $decreaseAmountCheck = array();
 
-        if($fetchPurchase && $oldItems){
+        if($oldItems){
 
             for ($i=0;$i<count($oldItems);$i++) {
                 if ($this->warehouse_products_model->decreaseAmount(
                     $oldItems[$i]->productID,
-                    $warehousID,
+                    $oldItems[$i]->warehouseTo,
                     $oldItems[$i]->quantity
                 )){
                     $decreaseAmountCheck[] = true;
@@ -472,14 +483,14 @@ class Purchases extends CI_Controller{
             if(!is_array(false,$decreaseAmountCheck)) {
 
 
-                $deletePurchase = $this->purchases_model->delete(
+                $deletePurchase = $this->item_slips_model->delete(
                     array(
                         "ID" => $id
                 ));
 
-                $deleteItems = $this->purchases_items_model->delete(
+                $deleteItems = $this->item_handlings_model->delete(
                     array(
-                        "purchaseID" => $id
+                        "slipID" => $id
                     ));
 
 
@@ -532,6 +543,7 @@ class Purchases extends CI_Controller{
         $rowHtml .= '<td class="custom-product-td">';
         $rowHtml .= '<input type="text" required onfocus="addProduct(this)" name="product-code[]" class="form-control custom-product-input mySearch product-code">';
         $rowHtml .= '<input type="hidden" name="productID[]" class="productID">';
+        /*$rowHtml .= '<input type="hidden" name="productWarehouse[]" class="productWarehouse">';*/
         $rowHtml .= '</td>';
         $rowHtml .= '<td class="custom-product-td">';
         $rowHtml .= '<input type="text" required name="product-name[]" readonly  class="form-control custom-product-input">';
@@ -540,7 +552,7 @@ class Purchases extends CI_Controller{
         $rowHtml .= '<select name="product-unit[]" required class="form-control custom-product-select">';
         $rowHtml .= '<option value="">Ölçü Vahidi</option>';
         foreach ($units as $unit){
-            $rowHtml .= '<option value="'.$unit->shortName.'">'.$unit->name.'</option>';
+            $rowHtml .= '<option value="'.$unit->name.'">'.$unit->name.'</option>';
         }
         $rowHtml .= '</select>';
         $rowHtml .= '</td>';
@@ -561,8 +573,262 @@ class Purchases extends CI_Controller{
         echo $rowHtml;
     }
 
+    private function readCsvFile($file){
+
+        $file_mimes = array('text/x-comma-separated-values', 'text/comma-separated-values', 'application/octet-stream', 'application/vnd.ms-excel', 'application/x-csv', 'text/x-csv', 'text/csv', 'application/csv', 'application/excel', 'application/vnd.msexcel', 'text/plain', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+        if(!is_null($file) && isset($file['name']) && in_array($file['type'], $file_mimes)){
+
+            require_once APPPATH.'third_party/phpSpreadSheet/autoload.php';
+
+            $fileName = $file['tmp_name'];
+
+            $reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
+            $reader->setLoadAllSheets();
+            $reader->setReadDataOnly(true);
+
+            /* Read Csv file as Text */
+            $directData = file_get_contents($fileName);
+            $comma     = substr_count($directData,",");
+            $semicolon = substr_count($directData,";");
+
+            /* Set CSV parsing options */
+            if($comma>$semicolon):
+                $reader->setDelimiter(',');
+            else:
+                $reader->setDelimiter(';');
+            endif;
+            $reader->setEnclosure('"');
+            $reader->setSheetIndex(0);
+
+            $spreadsheet = $reader->load($fileName);
+
+            $fileData = $spreadsheet->getActiveSheet()->toArray(null,false,true,true);
+
+            return $fileData;
+        }
+        else{
+            return false;
+        }
+
+    }
+
+    public function importCsvFile(){
+
+        $file = $_FILES['csvFile'];
+        $result = array();
+        if(!is_null($file)){
+            $fileData = self::readCsvFile($file);
+            if($fileData != false && is_array($fileData)){
+                $returnData            = self::csv2HtmlTable($fileData);
+                $returnData['header']  = "Ürünler başarıyla eklendi";
+                $message               = self::makeImportCsvResultMessage($returnData);
+                $result['message']     = $message;
+                $result['rowHtml']     = $returnData['rowHtml'];
+            }
+            else{
+                $returnData = array();
+                $returnData['header']               = "Ürünleri eklemede sorun oluştu";
+                $returnData['rowHtml']              = "";
+                $returnData['comparison']           = "";
+                $returnData['addedItems']           = 0;
+                $returnData['undefinedItemsCount']  = 0;
+                $returnData['undefinedItems']       = "";
+                $returnData['totalItems']           = 0;
+
+                $message           = self::makeImportCsvResultMessage($returnData);
+                $result['message'] = $message;
+            }
+        }
+        else{
+
+            $returnData = array();
+            $returnData['header']               = "Dosya okuma zamanı hata oluştu";
+            $returnData['rowHtml']              = "";
+            $returnData['comparison']           = "";
+            $returnData['addedItems']           = 0;
+            $returnData['undefinedItemsCount']  = 0;
+            $returnData['undefinedItems']       = "";
+            $returnData['totalItems']           = 0;
+
+            $message = self::makeImportCsvResultMessage($returnData);
+            $result['message'] = $message;
+        }
+
+        echo json_encode($result);
+    }
+
+    private function csv2HtmlTable($fileData){
+        $rowHtml = "";
+        $comparison = "";
+        $result = array();
+        $arrLen = count($fileData);
+        $rowCounter = 1;
+        $addedItems = 1;
+        $totalItems = 1;
+        $undefinedItemsCount = 0;
+        $undefinedItems = "";
+        $units    = $this->units_model->getAll();
+
+        for($i=4;$i<=$arrLen;$i++){
+            if((!empty($fileData[$i]['B']) || $fileData[$i]['B']!="") && (!empty($fileData[$i]['C']) || $fileData[$i]['C']!="") && (!empty($fileData[$i]['D']) || $fileData[$i]['D']!="")){
+                $product = self::checkProductFromDB(trim($fileData[$i]['B']) );
+                if($product != false){
+
+                    $comparison .= self::makeComparison($product->ID, (float)$fileData[$i]['D']);
+
+                    $rowHtml .= '<tr id="items-table-row-'.$rowCounter.'">';
+                    $rowHtml .= '<td class="custom-product-td">';
+                    $rowHtml .= '<input type="text" required onfocus="addProduct(this)" name="product-code[]" class="form-control custom-product-input mySearch product-code" value="'.$product->code.'">';
+                    $rowHtml .= '<input type="hidden" name="productID[]" class="productID" value="'.$product->ID.'">';
+                    /*$rowHtml .= '<input type="hidden" name="productWarehouse[]" class="productWarehouse">';*/
+                    $rowHtml .= '</td>';
+                    $rowHtml .= '<td class="custom-product-td">';
+                    $rowHtml .= '<input type="text" required name="product-name[]" readonly  class="form-control custom-product-input" value="'.$product->title.'">';
+                    $rowHtml .= '</td>';
+                    $rowHtml .= '<td class="custom-product-td">';
+                    $rowHtml .= '<select name="product-unit[]" required class="form-control custom-product-select">';
+                    $rowHtml .= '<option value="">Ölçü Vahidi</option>';
+                    foreach ($units as $unit){
+                        $selected = ($unit->ID == $product->unitID)?"selected":"";
+                        $rowHtml .= '<option '.$selected.' value="'.$unit->name.'">'.$unit->name.'</option>';
+                    }
+                    $rowHtml .= '</select>';
+                    $rowHtml .= '</td>';
+                    $rowHtml .= '<td class="custom-product-td"><fieldset><div class="input-group">';
+                    $rowHtml .= '<input onkeyup="calculateGrassTotal(this)" required type="text" name="product-quantity[]" type="text" class="form-control custom-product-input custom-touch-spin product-quantity general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="'.$fileData[$i]['D'].'" />';
+                    $rowHtml .= '</div></fieldset></td>';
+                    $rowHtml .= '<td class="custom-product-td"><fieldset><div class="input-group">';
+                    $rowHtml .= '<input onkeyup="calculateGrassTotal(this)" required type="text" name="product-price[]" type="text" class="form-control custom-product-input custom-touch-spin product-price general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" />';
+                    $rowHtml .= '</div></fieldset></td>';
+                    $rowHtml .= '<td class="custom-product-td"><fieldset><div class="input-group">';
+                    $rowHtml .= '<input type="text" onkeyup="applyDiscount(this)" name="product-discount[]" type="text" class="form-control custom-product-input custom-touch-spin product-discount general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" />';
+                    $rowHtml .= '</div></fieldset></td>';
+                    $rowHtml .= '<td class="custom-product-td">';
+                    $rowHtml .= '<input type="text" name="product-grassTotal[]" required readonly class="form-control custom-product-input product-grassTotal">';
+                    $rowHtml .= '</td>';
+                    $rowHtml .= '<td class="custom-product-td product-operation-td"><i onclick="removeRow(this)" data-belong-row-id="'.$rowCounter.'" class="fa fa-trash red"></i></td>';
+
+                    $rowCounter++;
+                }
+                else{
+                    $undefinedItemsCount++;
+                    if($i==$arrLen):
+                        $undefinedItems.=$fileData[$i]['B'];
+                    else:
+                        $undefinedItems.=$fileData[$i]['B'].', ';
+                    endif;
+                }
+                $totalItems++;
+            }
+
+        }
+        /* Prepare result */
+        $addedItems = $rowCounter;
+        $result['rowHtml']              = $rowHtml;
+        $result['comparison']           = $comparison;
+        $result['addedItems']           = $addedItems;
+        $result['undefinedItemsCount']  = $undefinedItemsCount;
+        $result['undefinedItems']       = $undefinedItems;
+        $result['totalItems']           = $totalItems;
+
+        return $result;
+    }
+
+    private function makeComparison($productID, $fileAmount){
+        $result = "";
+        $productDetails = $this->warehouse_products_model->fetchProductWithAllDetails(array(
+            "wp.productID"  =>  $productID
+        ));
+        if($productDetails){
+            foreach ($productDetails as $product){
+                $result.= '<tr>';
+                $result.= '<td>'.$product->code.'</td>';
+
+                $className = ($product->netQuantity<$fileAmount)?"font-weight-bold red":"";
+                $result.= '<td class="'.$className.'">'.$product->netQuantity.'</td>';
+
+                $className = ($fileAmount<$product->netQuantity)?"font-weight-bold red":"";
+                $result.= '<td class="'.$className.'">'.number_format($fileAmount,6).'</td>';
+
+                $result.= '<td>'.$product->wName.'</td>';
+                $result.= '</tr>';
+            }
+        }
+        return $result;
+    }
+
+    private function checkProductFromDB($productCode){
+        $this->load->model('products_model');
+        $product = $this->products_model->get(array(
+            "code"  => $productCode
+        ));
+        if($product){
+            return $product;
+        }
+        else{
+            return false;
+        }
+    }
+
+    private function makeImportCsvResultMessage($messages){
+        $message = "";
+        $message .= '<h3 class="success font-weight-bold" id="header-message">'.$messages['header'].'</h3>
+                    <p>
+                        <span class="font-weight-bold">Dosyadaki toplam ürün sayısı: </span>  '.$messages['totalItems'].'
+                    </p>
+                    <p>
+                        <span class="font-weight-bold">Eklenen ürün sayısı: </span> '.$messages['addedItems'].'
+                    </p>
+                    <p>
+                        <span class="font-weight-bold">Bulunmayan ürün sayısı: </span> '.$messages['undefinedItemsCount'].'
+                    </p>
+                    <div class="collapse-icon accordion-icon-rotate">
+                        <div id="headingCollapse12" class="card-header p-0">
+                        <a data-toggle="collapse" href="#collapse12" aria-expanded="false" aria-controls="collapse12"
+                           class="card-title lead collapsed">Bulunmayan ürünler listesi</a>
+                    </div>
+                        <div id="collapse12" role="tabpanel" aria-labelledby="headingCollapse12" class="collapse"
+                         aria-expanded="false">
+                        <div class="card-content">
+                            <div class="card-body">
+                                '.$messages['undefinedItems'].'
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <hr>
+                    <div class="collapse-icon accordion-icon-rotate">
+                        <div id="headingCollapse13" class="card-header p-0">
+                        <a data-toggle="collapse" href="#collapse13" aria-expanded="false" aria-controls="collapse13"
+                           class="card-title lead collapsed">Farkları</a>
+                    </div>
+                        <div id="collapse13" role="tabpanel" aria-labelledby="headingCollapse13" class="collapse"
+                         aria-expanded="false">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <table class="table full-width display nowrap table-striped table-bordered scroll-horizontal-vertical base-style">
+                                    <thead>
+                                        <tr>
+                                            <th>Stok Kodu</th>
+                                            <th>Sistemdeki Stok Miktarı</th>
+                                            <th>Dosyadaki Stok Miktarı</th>
+                                            <th>Depo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    '.$messages['comparison'].'
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    </div>';
+        return $message;
+    }
+
     public function getDataTable(){
-        echo $this->purchases_model->getDataTable();
+        echo $this->item_slips_model->getDataTable($where=array("slipType"=>"purchase"));
     }
 
 }

@@ -18,20 +18,18 @@ var drawTable = $('#salesTable').DataTable( {
             "className": "text-center"
         },
         {
-            "targets":[0,6],
+            "targets":[0],
             visible: false
         },
 
         {
-            "targets":[0,5,6,7,8],
+            "targets":[0,4],
             searchable:false
         },
         {
-            "targets":[5],
-            "data": function ( row, type, val, meta ) {
-                return row[5]+' '+row[6];
-            }
-        }
+            "targets":[3,4],
+            "className": "text-center"
+        },
     ],
 
     "fnDrawCallback": function() {
@@ -42,8 +40,8 @@ var drawTable = $('#salesTable').DataTable( {
         });
 
     },
-    "lengthMenu":[10, 15, 25, 50,100, "Hamısı"],
-    "scrollY": "50vh",
+    "lengthMenu":[[10, 15, 25, 50,100, -1], [10, 15, 25, 50,100, "Hamısı"]],
+    "scrollY": "100vh",
     "scrollX": true,
     "pageLength": 10,
     "processing": true,

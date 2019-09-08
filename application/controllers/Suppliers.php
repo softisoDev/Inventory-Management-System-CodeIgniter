@@ -11,10 +11,13 @@ class Suppliers extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        if(!get_active_user()){
+            redirect(base_url("login"));
+        }
         $this->viewFolder = "suppliers_v";
         $this->pageTitle = "Tədarükçü Firma(lar)/Şəxs(lər)";
         $this->pageTitleExt = PageTitleExt;
-        $this->load->model('suppliers_model');
+        $this->load->model('persons_model');
     }
 
     public function index(){
@@ -34,7 +37,7 @@ class Suppliers extends CI_Controller
         $viewData->subViewFolder    = "add";
         $viewData->pageTitle        = "Tədarükçü Əlavə Et".$this->pageTitleExt;
         $viewData->header           = "Tədarükçü Əlavə Et";
-        $viewData->newCode          = $this->suppliers_model->generate_autoCode();
+        $viewData->newCode          = $this->persons_model->generate_autoCode('SP');
 
         $this->load->view("{$viewData->viewFolder}/{$viewData->subViewFolder}/index",$viewData);
     }
@@ -63,10 +66,11 @@ class Suppliers extends CI_Controller
         $checkValidation = $this->form_validation->run();
 
         if($checkValidation){
-            $save = $this->suppliers_model->add(array(
+            $save = $this->persons_model->add(array(
+                "personType"        => 'supplier',
                 "autoCode"          => $this->input->post("auto-code"),
                 "code"              => $this->input->post("code"),
-                "name"              => $this->input->post("supplier-name"),
+                "fullName"          => $this->input->post("supplier-name"),
                 "companyName"       => $this->input->post("company"),
                 "address"           => $this->input->post("address"),
                 "email"             => $this->input->post("email"),
@@ -107,7 +111,7 @@ class Suppliers extends CI_Controller
             $viewData->subViewFolder    = "add";
             $viewData->pageTitle        = "Tədarükçü Əlavə Et".$this->pageTitleExt;
             $viewData->header           = "Tədarükçü Əlavə Et";
-            $viewData->newCode          = $this->suppliers_model->generate_autoCode();
+            $viewData->newCode          = $this->persons_model->generate_autoCode('SP');
             $viewData->form_error       = true;
 
             $this->load->view("{$viewData->viewFolder}/{$viewData->subViewFolder}/index",$viewData);
@@ -121,8 +125,8 @@ class Suppliers extends CI_Controller
         $viewData->subViewFolder    = "update";
         $viewData->pageTitle        = "Tədarükçü Redaktə Et".$this->pageTitleExt;
         $viewData->header           = "Tədarükçü Redaktə Et";
-        $viewData->newCode          = $this->suppliers_model->generate_autoCode();
-        $viewData->items            = $this->suppliers_model->get(array(
+        $viewData->newCode          = $this->persons_model->generate_autoCode('SP');
+        $viewData->items            = $this->persons_model->get(array(
             "ID"=>$id
         ));
         if(!$viewData->items):
@@ -156,13 +160,13 @@ class Suppliers extends CI_Controller
         $checkValidation = $this->form_validation->run();
 
         if($checkValidation){
-            $update = $this->suppliers_model->update(
+            $update = $this->persons_model->update(
                 array(
                   "ID" => $id
                 ),
                 array(
                 "code"              => $this->input->post("code"),
-                "name"              => $this->input->post("supplier-name"),
+                "fullName"          => $this->input->post("supplier-name"),
                 "companyName"       => $this->input->post("company"),
                 "address"           => $this->input->post("address"),
                 "email"             => $this->input->post("email"),
@@ -204,7 +208,7 @@ class Suppliers extends CI_Controller
             $viewData->subViewFolder    = "add";
             $viewData->pageTitle        = "Tədarükçü Əlavə Et".$this->pageTitleExt;
             $viewData->header           = "Tədarükçü Əlavə Et";
-            $viewData->newCode          = $this->suppliers_model->generate_autoCode();
+            $viewData->newCode          = $this->persons_model->generate_autoCode('SP');
             $viewData->form_error       = true;
 
             $this->load->view("{$viewData->viewFolder}/{$viewData->subViewFolder}/index",$viewData);
@@ -213,7 +217,7 @@ class Suppliers extends CI_Controller
 
     public function delete($id){
 
-        $delete = $this->suppliers_model->delete(array(
+        $delete = $this->persons_model->delete(array(
             "ID" => $id
         ));
 
@@ -243,7 +247,7 @@ class Suppliers extends CI_Controller
     {
         if ($id) {
             $isChecked = ($this->input->post("isChecked") === "true") ? 1 : 0;
-            $isActive = $this->suppliers_model->update(
+            $isActive = $this->persons_model->update(
                 array(
                     "ID" => $id
                 ),
@@ -255,7 +259,7 @@ class Suppliers extends CI_Controller
     }
 
     public function getDataTable(){
-        echo $this->suppliers_model->getDataTable();
+        echo $this->persons_model->getDataTable($where = array("personType"=>"supplier"));
     }
 
 }

@@ -22,7 +22,7 @@
                 <div class="card-content collapse show">
                     <?php if($result): ?>
                     <div class="card-body card-dashboard">
-                        <form class="form" method="post" action="<?php echo base_url("purchases/update/{$purchases->ID}"); ?>">
+                        <form class="form" method="post" action="<?php echo base_url("sales/update/{$sales->ID}"); ?>">
                             <div class="form-body">
                                 <h4 class="form-section"><i class="la la-paperclip"></i> Əsas Sahələr</h4>
                                 <div class="row">
@@ -30,7 +30,7 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="auto-code">Avtomatik Kod</label>
-                                            <input type="text" required readonly value="<?php echo $purchases->autoCode; ?>" id="auto-code"
+                                            <input type="text" required readonly value="<?php echo $sales->autoCode; ?>" id="auto-code"
                                                    class="form-control border-primary" placeholder="Avtomatik Kod" name="auto-code">
                                             <?php if(isset($form_error)): ?>
                                                 <span class="font-italic red font-weight-bold"><?php echo form_error('auto-code'); ?></span>
@@ -41,7 +41,7 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="code">Kodu</label>
-                                            <input type="text" required id="code" value="<?php echo $purchases->code; ?>" class="form-control border-primary" placeholder="Kodu" name="code">
+                                            <input type="text" required id="code" value="<?php echo $sales->code; ?>" class="form-control border-primary" placeholder="Kodu" name="code">
                                             <?php if(isset($form_error)): ?>
                                                 <span class="font-italic red font-weight-bold"><?php echo form_error('code'); ?></span>
                                             <?php endif; ?>
@@ -55,14 +55,15 @@
                                                 <option value="">Anbar</option>
                                                 <?php
                                                 foreach ($warehouses as $warehouse){ ?>
-                                                    <option <?php echo ($warehouse->ID == $purchases->warehouseID) ? "selected":""; ?>
+                                                    <option <?php echo ($warehouse->ID == $sales->warehouseFrom) ? "selected":""; ?>
                                                             value="<?php echo $warehouse->ID; ?>">
                                                         <?php echo $warehouse->name; ?>
                                                     </option>
                                                 <?php }
                                                 ?>
                                             </select>
-                                            <input type="hidden" readonly required id="warehouse" name="warehouse" value="<? echo $purchases->warehouseID; ?>">
+                                            <input type="hidden" readonly required id="warehouse" name="warehouse" value="<? echo $sales->warehouseFrom; ?>">
+
                                             <?php if(isset($form_error)): ?>
                                                 <span class="font-italic red font-weight-bold"><?php echo form_error('warehouse'); ?></span>
                                             <?php endif; ?>
@@ -71,13 +72,13 @@
 
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="supplier">Tədarükçü Firma/Şəxs </label><span class="pull-right">+ Əlavə Et</span>
-                                            <select class="select2 form-control border-primary" required name="supplier" id="supplier">
+                                            <label for="customer">Müştəri (Firma/Şəxs) </label><span class="pull-right">+ Əlavə Et</span>
+                                            <select class="select2 form-control border-primary" required name="customer" id="customer">
                                                 <option value="">Tədarükçü Firma/Şəxs</option>
                                                 <?php
-                                                foreach ($suppliers as $supplier){
-                                                    $selected = ($supplier->ID == $purchases->supplierID) ?"selected":"";
-                                                    echo '<option '.$selected.' value="'.$supplier->ID.'">'.$supplier->name.'</option>';
+                                                foreach ($customers as $customer){
+                                                    $selected = ($customer->ID == $sales->personID) ?"selected":"";
+                                                    echo '<option '.$selected.' value="'.$customer->ID.'">'.$customer->fullName.'</option>';
                                                 }
                                                 ?>
                                             </select>
@@ -97,7 +98,7 @@
                                                 <option value="">Əməliyyat Tipi</option>
                                                 <?php
                                                 foreach ($billTypes as $billType){
-                                                    $selected = ($billType->ID == $purchases->billType) ?"selected":"";
+                                                    $selected = ($billType->ID == $sales->billType) ?"selected":"";
                                                     echo '<option '.$selected.' value="'.$billType->ID.'">'.$billType->name.'</option>';
                                                 }
                                                 ?>
@@ -115,7 +116,7 @@
                                                 <?php
                                                 foreach ($currency as $curr){ ?>
                                                     <option
-                                                        <?php echo ($curr->symbol==$purchases->currency) ? "selected":""; ?>
+                                                        <?php echo ($curr->symbol==$sales->currency) ? "selected":""; ?>
                                                             value="<?php echo $curr->symbol; ?>">
                                                         <?php echo $curr->name; ?> (<?php echo $curr->symbol; ?>)
                                                     </option>';
@@ -127,7 +128,7 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="date">Redaktə Tarixi</label>
-                                            <?php $date = new DateTime($purchases->date);
+                                            <?php $date = new DateTime($sales->date);
                                                   $date = $date->format('Y/m/d');
                                             ?>
                                             <input value="<?php echo $date; ?>" type="text" required id="date" class="form-control border-primary" placeholder="Tarix" name="date">
@@ -143,13 +144,45 @@
                                                 <?php
 
                                                 ?>
-                                                <input type="text" class="form-control border-primary" id="search-requisition" name="search-requisition" value="<?php echo $purchases->rCode; ?>" />
+                                                <input type="text" class="form-control border-primary" id="search-requisition" name="search-requisition" value="<?php echo $sales->rCode; ?>" />
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text"><i class="ft-search"></i></span>
                                                 </div>
-                                                <input type="hidden" class="form-control border-primary" value="<?php echo $purchases->requisitionID; ?>" id="requisition" name="requisition" />
+                                                <input type="hidden" class="form-control border-primary" value="<?php echo $sales->requisitionID; ?>" id="requisition" name="requisition" />
                                             </div>
                                         </fieldset>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="special-2">Ödəmə Tipi</label>
+                                            <select required class="select2 form-control border-primary" name="paymentType" id="paymentType">
+                                                <option value="">Ödəmə Tipi</option>
+                                                <?php foreach ($paymentTypes as $paymentType){ ?>
+                                                    <option <?php echo ($paymentType->ID == $sales->paymentTypeID) ? "selected":""; ?>
+                                                            value="<?php echo $paymentType->ID; ?>">
+                                                        <?php echo $paymentType->name; ?>
+                                                    </option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="special-2">Biller</label>
+                                            <select required class="select2 form-control border-primary" name="biller" id="biller">
+                                                <?php foreach ($billers as $biller){ ?>
+                                                    <option <?php echo ($biller->ID == $sales->billerID) ? "selected":"";?> value="<?php echo $biller->ID; ?>">
+                                                        <?php echo $biller->fullName; ?>
+                                                    </option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -178,7 +211,7 @@
 
                                             <div class="col-md-12">
                                         <span class="pull-left">
-                                            <input type="hidden" readonly id="last-tr-id" value="<?php echo count($purchasesItems); ?>">
+                                            <input type="hidden" readonly id="last-tr-id" value="<?php echo count($salesItems); ?>">
                                             <input type="hidden" readonly id="focused-tr-id" value="1">
                                         </span>
                                                 <span class="pull-right pb-1">
@@ -199,14 +232,16 @@
                                                     </thead>
 
                                                     <tbody>
-                                                    <?php for($i=0;$i<=count($purchasesItems)-1;$i++){ ?>
+                                                    <?php for($i=0;$i<=count($salesItems)-1;$i++){ ?>
                                                         <tr id="items-table-row-<?php echo $i+1; ?>">
+                                                            <td class="custom-product-td">
+                                                                <input type="text" required onfocus="addProduct(this)" name="product-code[]" value="<?php echo $salesItems[$i]->productCode; ?>" class="form-control custom-product-input mySearch product-code">
+                                                                <input type="hidden" name="productID[]" class="productID" value="<?php echo $salesItems[$i]->productID; ?>">
+                                                            </td>
+
                                                         <td class="custom-product-td">
-                                                            <input type="text" required onfocus="addProduct(this)" name="product-code[]"  class="form-control custom-product-input mySearch product-code" value="<?php echo $purchasesItems[$i]->productCode; ?>">
-                                                            <input type="hidden" name="productID[]" class="productID" value="<?php echo $purchasesItems[$i]->productID; ?>">
-                                                        </td>
-                                                        <td class="custom-product-td">
-                                                            <input type="text" required name="product-name[]" readonly class="form-control custom-product-input" value="<?php echo $purchasesItems[$i]->productTitle; ?>">
+                                                            <input type="text" required name="product-name[]" readonly class="form-control custom-product-input" value="<?php echo $salesItems[$i]->productTitle; ?>">
+                                                            <!--<input type="hidden" name="productWarehouse[]" class="productWarehouse" value="<?php /*echo $salesItems[$i]->warehouseFrom; */?>">-->
                                                         </td>
                                                         <td class="custom-product-td">
                                                             <select name="product-unit[]" required  class="form-control custom-product-select product-unit">
@@ -214,8 +249,8 @@
                                                                 <?php
                                                                 foreach ($units as $unit){ ?>
                                                                    <option
-                                                                   <?php echo ($purchasesItems[$i]->productUnit==$unit->shortName)?"selected":""; ?>
-                                                                           value="<?php echo $unit->shortName;?>">
+                                                                   <?php echo ($salesItems[$i]->productUnit==$unit->name)?"selected":""; ?>
+                                                                           value="<?php echo $unit->name;?>">
                                                                        <?php echo $unit->name; ?>
                                                                    </option>
                                                                <?php }
@@ -225,26 +260,27 @@
                                                         <td class="custom-product-td">
                                                             <fieldset>
                                                                 <div class="input-group">
-                                                                    <input onkeyup="calculateGrassTotal(this)" required type="text" name="product-quantity[]" type="text" class="form-control custom-product-input custom-touch-spin product-quantity general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo $purchasesItems[$i]->quantity; ?>" />
+                                                                    <input onkeyup="calculateGrassTotal(this)" required type="text" name="product-quantity[]" class="form-control custom-product-input custom-touch-spin product-quantity general-touchspin sale-bill" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo $salesItems[$i]->quantity; ?>" />
+                                                                    <input class="max-quantity" id="max-quantity" name="max-quantity" type="hidden">
                                                                 </div>
                                                             </fieldset>
                                                         </td>
                                                         <td class="custom-product-td">
                                                             <fieldset>
                                                                 <div class="input-group">
-                                                                    <input onkeyup="calculateGrassTotal(this)" required type="text" name="product-price[]" type="text" class="form-control custom-product-input custom-touch-spin product-price general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo $purchasesItems[$i]->price; ?>" />
+                                                                    <input onkeyup="calculateGrassTotal(this)" required type="text" name="product-price[]" class="form-control custom-product-input custom-touch-spin product-price general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo $salesItems[$i]->price; ?>" />
                                                                 </div>
                                                             </fieldset>
                                                         </td>
                                                         <td class="custom-product-td">
                                                             <fieldset>
                                                                 <div class="input-group">
-                                                                    <input type="text" onkeyup="applyDiscount(this)" name="product-discount[]" type="text" class="form-control custom-product-input custom-touch-spin product-discount general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo ($purchasesItems[$i]->discountValue!='0.00')?$purchasesItems[$i]->discountValue:"";  ?>" />
+                                                                    <input type="text" onkeyup="applyDiscount(this)" name="product-discount[]" class="form-control custom-product-input custom-touch-spin product-discount general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo ($salesItems[$i]->discountValue!='0.00')?$salesItems[$i]->discountValue:"";  ?>" />
                                                                 </div>
                                                             </fieldset>
                                                         </td>
                                                         <td class="custom-product-td">
-                                                            <input type="text" name="product-grassTotal[]" required readonly class="form-control custom-product-input product-grassTotal" value="<?php echo $purchasesItems[$i]->grassTotal; ?>" >
+                                                            <input type="text" name="product-grassTotal[]" required readonly class="form-control custom-product-input product-grassTotal" value="<?php echo $salesItems[$i]->grassTotal; ?>" >
                                                         </td>
                                                         <td class="custom-product-td product-operation-td">
                                                             <i onclick="removeRow(this)" data-belong-row-id="<?php echo $i+1;?>" class="fa fa-trash red"></i>
@@ -259,15 +295,30 @@
                                     </div>
                                     <div class="tab-pane" id="tabIcon32" aria-labelledby="baseIcon-tab32">
                                         <div class="row">
-                                            <div class="col-md-12">
+
+                                            <div class="col-md-6">
+
+                                                <div class="form-group">
+                                                    <label for="special-1">Faktura İrsaliye</label>
+                                                    <input type="text" id="waybill" class="form-control border-primary" placeholder="Faktura İrsaliye" name="waybill">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="special-2">Təhvil Alan</label>
+                                                    <input type="text" id="receivedBy" class="form-control border-primary" placeholder="Təhvil Alan" name="receivedBy">
+                                                </div>
+
+                                            </div>
+
+                                            <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="special-1">Xüsusi Sahə-1</label>
-                                                    <input value="<?php echo $purchases->special1; ?>" type="text" id="special-1" class="form-control border-primary" placeholder="Xüsusi Sahə-1" name="special-1">
+                                                    <input value="<?php echo $sales->special1; ?>" type="text" id="special-1" class="form-control border-primary" placeholder="Xüsusi Sahə-1" name="special-1">
                                                 </div>
 
                                                 <div class="form-group">
                                                     <label for="special-2">Xüsusi Sahə-2</label>
-                                                    <input value="<?php echo $purchases->special2; ?>" type="text" id="special-2" class="form-control border-primary" placeholder="Xüsusi Sahə-2" name="special-2">
+                                                    <input value="<?php echo $sales->special2; ?>" type="text" id="special-2" class="form-control border-primary" placeholder="Xüsusi Sahə-2" name="special-2">
                                                 </div>
 
                                             </div>
@@ -279,7 +330,7 @@
                                                 <div class="form-group">
                                                     <label for="note">Qeyd</label>
                                                     <div class="position-relative has-icon-left">
-                                                        <textarea id="note" rows="5" class="form-control" name="note" placeholder="Qeyd"><?php echo $purchases->note; ?></textarea>
+                                                        <textarea id="note" rows="5" class="form-control" name="note" placeholder="Qeyd"><?php echo $sales->note; ?></textarea>
                                                         <div class="form-control-position">
                                                             <i class="fa fa-pencil"></i>
                                                         </div>
@@ -299,9 +350,9 @@
                                 </div>
                                 <div class="col-md-12 text-right">
                                     <p><strong>Cəm Məhsul Endirimi:</strong> <span id="totalProductDiscount">
-                                            <?php echo $purchases->totalProductDiscount; ?>
+                                            <?php echo $sales->totalProductDiscount; ?>
                                         </span> <span class="currency-indicator">AZN</span></p>
-                                    <input value="<?php echo $purchases->totalProductDiscount; ?>" type="hidden" id="totalProductDiscount-input" required name="totalProductDiscount">
+                                    <input value="<?php echo $sales->totalProductDiscount; ?>" type="hidden" id="totalProductDiscount-input" required name="totalProductDiscount">
                                 </div>
 
                                 <!--  GENERAL DISCOUNT START  -->
@@ -310,29 +361,42 @@
                                 <div class="col-md-4 text-right">
                                     <div class="input-group">
                                         <label class="mtp-5 black"><strong>Ümumi Endirim (<span class="currency-indicator">₼</span>) ilə:</strong></label>
-                                        <input type="text" onkeyup="calculateTotalDiscount()" name="generalDiscountValue" id="generalDiscountValue" type="text" class="form-control custom-product-input custom-touch-spin general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo ($purchases->generalDiscountValue!='0.00')?$purchases->generalDiscountValue:""; ?>" />
+                                        <input type="text" onkeyup="calculateTotalDiscount()" name="generalDiscountValue" id="generalDiscountValue" class="form-control custom-product-input custom-touch-spin general-touchspin" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" value="<?php echo ($sales->generalDiscountValue!='0.00')?$sales->generalDiscountValue:""; ?>" />
                                     </div>
                                 </div>
                                 <!--     GENERAL DISCOUNT END   -->
 
+                                <!--  VAT START  -->
+
+                                <div class="col-md-4"></div>
+                                <div class="col-md-5"></div>
+                                <div class="col-md-3 text-right">
+                                    <div class="input-group">
+                                        <label class="mtp-5 black"><strong>ƏDV: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong></label>
+                                        <input type="text" onkeyup="calculateVAT(this)" name="vat" id="vat" class="form-control custom-product-input custom-touch-spin vat" data-bts-button-down-class="btn btn-info" data-bts-button-up-class="btn btn-info" />
+                                        <input type="hidden" name="totalVAT" id="totalVAT">
+                                    </div>
+                                </div>
+                                <!--     VAT END   -->
+                                Tədarükçü Firma/Şəxs
                                 <div class="col-md-12 text-right mt-1">
                                     <p><strong>Cəm Endirim:</strong> <span id="totalDiscount">
-                                            <?php echo $purchases->TotalDiscount; ?>
+                                            <?php echo $sales->TotalDiscount; ?>
                                         </span> <span class="currency-indicator">AZN</span></p>
-                                    <input  value="<?php echo $purchases->TotalDiscount; ?>" type="hidden" id="totalDiscount-input" required name="totalDiscount">
+                                    <input  value="<?php echo $sales->TotalDiscount; ?>" type="hidden" id="totalDiscount-input" required name="totalDiscount">
                                 </div>
 
                                 <div class="col-md-12 text-right mt-1">
                                     <p><strong>Yekun Qiymət:</strong> <span id="grandTotal">
-                                             <?php echo $purchases->total; ?>
+                                             <?php echo $sales->total; ?>
                                         </span> <span class="currency-indicator">AZN</span></p>
-                                    <input value="<?php echo $purchases->total; ?>" type="hidden" name="grandTotal" required id="grandTotal-input">
+                                    <input value="<?php echo $sales->total; ?>" type="hidden" name="grandTotal" required id="grandTotal-input">
                                 </div>
 
                             </div>
 
                             <div class="form-actions text-center">
-                                <a href="<?php echo base_url('purchases'); ?>" class="btn btn-warning mr-1">
+                                <a href="<?php echo base_url('sales'); ?>" class="btn btn-warning mr-1">
                                     <i class="ft-x"></i> Ləğv Et
                                 </a>
                                 <button type="submit" class="btn btn-primary">

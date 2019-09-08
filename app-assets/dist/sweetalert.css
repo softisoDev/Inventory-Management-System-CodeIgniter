@@ -217,7 +217,7 @@
 }
 body.stop-scrolling {
   height: 100%;
-  overflow: hidden;
+  overflow: auto !important;
 }
 .sweet-overlay {
   background-color: rgba(0, 0, 0, 0.4);

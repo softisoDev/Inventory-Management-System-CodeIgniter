@@ -71,7 +71,7 @@
                                                 <option value="">Müştəri (Firma/Şəxs)</option>
                                                 <?php
                                                 foreach ($customers as $customer){
-                                                    echo '<option value="'.$customer->ID.'">'.$customer->name.'</option>';
+                                                    echo '<option value="'.$customer->ID.'">'.$customer->fullName.'</option>';
                                                 }
                                                 ?>
                                             </select>
@@ -143,6 +143,7 @@
 
 
                                 <div class="row">
+
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="special-2">Ödəmə Tipi</label>
@@ -157,6 +158,20 @@
                                             </select>
                                         </div>
                                     </div>
+
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="special-2">Biller</label>
+                                            <select required class="select2 form-control border-primary" name="biller" id="biller">
+                                                <?php foreach ($billers as $biller){ ?>
+                                                    <option value="<?php echo $biller->ID; ?>">
+                                                        <?php echo $biller->fullName; ?>
+                                                    </option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+
                                 </div>
 
                                 <!--<h4 class="form-section"><i class="la la-cubes"></i>Məhsullar</h4>-->
@@ -207,6 +222,7 @@
                                                         <td class="custom-product-td">
                                                             <input type="text" required onfocus="addProduct(this)" name="product-code[]"  class="form-control custom-product-input mySearch product-code">
                                                             <input type="hidden" name="productID[]" class="productID">
+                                                            <!--<input type="hidden" name="productWarehouse[]" class="productWarehouse">-->
                                                         </td>
                                                         <td class="custom-product-td">
                                                             <input type="text" required name="product-name[]" readonly class="form-control custom-product-input">
@@ -216,9 +232,8 @@
                                                                 <option value="">Ölçü Vahidi</option>
                                                                 <?php
                                                                 foreach ($units as $unit){
-                                                                    echo '<option value="'.$unit->shortName.'">'.$unit->name.'</option>';
+                                                                    echo '<option value="'.$unit->name.'">'.$unit->name.'</option>';
                                                                 }
-                                                                ?>
                                                                 ?>
                                                             </select>
                                                         </td>
@@ -355,9 +370,14 @@
                                 <a href="<?php echo base_url('sales'); ?>" class="btn btn-warning mr-1">
                                     <i class="ft-x"></i> Ləğv Et
                                 </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="la la-check-square-o"></i> Saxla
+
+                                <button type="submit" name="saveAndPay" value="saveAndPay" class="btn btn-primary">
+                                    <i class="la la-check-square-o"></i> Saxla və Ödə
                                 </button>
+                                <!--<button type="submit" name="save" value="save" class="btn btn-primary">
+                                    Just Save
+                                </button>-->
+
                             </div>
                         </form>
                     </div>

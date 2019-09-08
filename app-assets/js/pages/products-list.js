@@ -32,8 +32,8 @@ var drawTable = $('#productsTable').DataTable( {
                 if(type==='display'){
                     var val = row[19]==1 ? "checked" : "unchecked";
                 }
-                var dataID = row[0];
-                var columnData = '<input type="checkbox" data-url="products/isActiveSetter/'+dataID+'" class="js-switch" '+val+' data-size="xs"/><label for="changeDataStatus" class="font-medium-2 text-bold-600 ml-1"></label>';
+                let dataID = row[0];
+                let columnData = '<input type="checkbox" data-url="products/isActiveSetter/'+dataID+'" class="js-switch" '+val+' data-size="xs"/><label for="changeDataStatus" class="font-medium-2 text-bold-600 ml-1"></label>';
                 return columnData;
             }
         }
@@ -48,10 +48,10 @@ var drawTable = $('#productsTable').DataTable( {
             new Switchery($(this)[0], { size: 'xsmall',className:"switchery switchery-xsmall" });
         });
     },
-    "lengthMenu":[10, 15, 25, 50,100, "Hamısı"],
-    "scrollY": "50vh",
+    "lengthMenu":[[10, 15, 25, 50, 100, -1],[10, 15, 25, 50,100, "Hamısı"]],
+    "scrollY": "100vh",
     "scrollX": true,
-    "pageLength": 10,
+    "pageLength": 25,
     "processing": true,
     "serverSide": true,
     "ajax": {
@@ -150,17 +150,24 @@ var drawTable = $('#productsTable').DataTable( {
                     text:'<i class="la la-eye"></i> Daha Ətraflı',
                     className:".dt-more-about-item",
                     action: function ( e, dt, node, config ) {
-                        var get_row = drawTable.rows({ selected: true }).nodes();
-                        var dataID = $(get_row[0]).data('id');
-
+                        let get_row = drawTable.rows({ selected: true }).nodes();
+                        let dataID = $(get_row[0]).data('id');
+                        $.ajax({
+                           url:app.host+"products/see-more",
+                           type:"POST",
+                           data:"productID="+dataID,
+                           success:function (data) {
+                               alert(data);
+                           }
+                        });
                     }
                 },
                 {
                     text:'<i class="la la-pencil"></i> Redaktə Et',
                     className:".dt-edit-item",
                     action: function ( e, dt, node, config ) {
-                        var get_row = drawTable.rows({ selected: true }).nodes();
-                        var dataID = $(get_row[0]).data('id');
+                        let get_row = drawTable.rows({ selected: true }).nodes();
+                        let dataID = $(get_row[0]).data('id');
                         window.location.href=app.host+"/products/update-product/"+dataID;
                     }
                 },
@@ -168,8 +175,8 @@ var drawTable = $('#productsTable').DataTable( {
                     text:'<i class="la la-trash"></i> Sil',
                     className:".dt-delete-item",
                     action: function ( e, dt, node, config ) {
-                        var get_row = drawTable.rows({ selected: true }).nodes();
-                        var dataID = $(get_row[0]).data('id');
+                        let get_row = drawTable.rows({ selected: true }).nodes();
+                        let dataID = $(get_row[0]).data('id');
                         removeData("products/delete/",dataID);
                     }
                 }

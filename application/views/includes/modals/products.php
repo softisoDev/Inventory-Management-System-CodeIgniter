@@ -88,7 +88,6 @@
 <script>
     function initProductsModal(warehouse="") {
     var url = app.host+"products/getDataTable";
-
     warehouse = parseInt(warehouse);
 
     if(warehouse!="" && !isNaN(warehouse)){
@@ -124,7 +123,7 @@
                 new Switchery($(this)[0], { size: 'xsmall',className:"switchery switchery-xsmall" });
             });
         },
-        "lengthMenu":[10, 15, 25, 50,100, "Hamısı"],
+        "lengthMenu":[[10, 15, 25, 50, 100, -1],[10, 15, 25, 50,100, "Hamısı"]],
         "scrollY": "50vh",
         "scrollX": true,
         "pageLength": 10,
@@ -165,12 +164,21 @@
                     var productUnit = drawTable.row(get_row).data()[6];
                     var focusedTrID = $('#focused-tr-id').val();
                     var row = $('#items-table-row-'+focusedTrID);
+
                     row.find('td:nth-child(1) input.product-code').val(productCode);
                     row.find('td:nth-child(1) input.productID').val(productID);
+                    /*if(warehouse=="" || isNaN(warehouse)){
+                        warehouse = $('#warehouse').val();
+                    }*/
+
+                    row.find('td:nth-child(1) input.productWarehouse').val(warehouse);
                     row.find('td:nth-child(2) input').val(productName);
                     row.find('td:nth-child(3) select').val(productUnit);
+                    if(typeof setAllUnitID2Input === 'function'){
+                        setAllUnitID2Input();
+                    }
                     if(warehouse!="" || !isNaN(warehouse)){
-                        var maxQuantity = drawTable.row(get_row).data()[13];
+                        let maxQuantity = drawTable.row(get_row).data()[13];
                         row.find('td:nth-child(4) input.max-quantity').val(maxQuantity);
                     }
 

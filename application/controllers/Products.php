@@ -10,6 +10,9 @@ class Products extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
+        if(!get_active_user()){
+            redirect(base_url("login"));
+        }
         $this->viewFolder   = "products_v";
         $this->pageTitle    = "Məhsullar";
         $this->pageTitleExt = PageTitleExt;
@@ -17,6 +20,7 @@ class Products extends CI_Controller {
         $this->load->model('units_model');
         $this->load->model('brands_model');
         $this->load->model('category_model');
+        $this->load->model('warehouse_products_model');
     }
 
     public function index(){
@@ -274,21 +278,42 @@ class Products extends CI_Controller {
         }
     }
 
+    public function checkProductCriticAmount(){
+        $products = $this->warehouse_products_model->fetchCriticStockAmountProducts();
+        print_r($products);
+    }
 
     public function getDataTable(){
         $where = array();
 
+        if(!is_null($this->input->post("productID"))){
+            $where = array(
+                "products.ID"    => $this->input->post("productID")
+            );
+        }
         if($this->uri->segment(3)){
             $where = array(
-                "warehouseID"   =>$this->uri->segment(3),
-                "stockAmount >" =>0.00
+                "warehouseID"   => $this->uri->segment(3),
+                "netQuantity >" => 0
             );
         }
 
         echo $this->products_model->getDataTable($where);
     }
 
-
+    public function searchDataJSON(){
+        $keyWord = $this->input->post("productCode");
+        $like   = array(
+            "code" => $keyWord
+        );
+        $datas   = $this->products_model->getAll(array(),$like);
+        $jsonData = array();
+        foreach ($datas as $data){
+            array_push($jsonData,array("id"=>$data->code,"label"=>$data->code,"value"=>$data->code));
+        }
+        echo json_encode($jsonData);
+    }
 
 
 }
+

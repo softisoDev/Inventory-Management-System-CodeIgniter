@@ -27,10 +27,8 @@
                                 <th>#</th>
                                 <th>Avto Kod</th>
                                 <th>Kodu</th>
-                                <th>Anbar</th>
                                 <th>Firma/Müştəri</th>
                                 <th>Ümumi Qiymət</th>
-                                <th>Valyuta</th>
                                 <th>Tələbnamə &#8470</th>
                                 <th>Tarix</th>
                                 <th>Əməliyyatçı</th>
@@ -41,10 +39,8 @@
                                 <th>#</th>
                                 <th>Avto Kod</th>
                                 <th>Kodu</th>
-                                <th>Anbar</th>
                                 <th>Firma/Müştəri</th>
                                 <th>Ümumi Qiymət</th>
-                                <th>Valyuta</th>
                                 <th>Tələbnamə &#8470</th>
                                 <th>Tarix</th>
                                 <th>Əməliyyatçı</th>

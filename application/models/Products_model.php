@@ -17,14 +17,17 @@ class Products_model extends CI_Model{
 
         $this->load->library('datatables');
 
-        $this->datatables->select('products.ID, autoCode, code, title, brands.name AS brandName, categories.name AS categoryName, units.shortName, cost, price, price2,  VAT, barcode, barcode2, stockAmount, criticStockAmount, shelfNo, products.createdAt, special1, special2, products.isActive AS productStatus, products.updatedAt, products.description, changableCode');
-        $this->datatables->from('products');
+        $this->datatables->select('products.ID AS pID, autoCode, code, title, brands.name AS brandName, categories.name AS categoryName, units.name, cost, price, price2,  VAT, barcode, barcode2, wp.netQuantity, criticStockAmount, shelfNo, products.createdAt, special1, special2, products.isActive AS productStatus, products.updatedAt, products.description, changableCode');
+        $this->datatables->from($this->tableName);
         $this->datatables->join('categories', 'products.categoryID=categories.ID', 'left');
         $this->datatables->join('brands', 'products.brandID=brands.ID', 'left');
         $this->datatables->join('units', 'products.unitID=units.ID', 'left');
+
         if(!empty($where)):
-            $this->datatables->join('warehouse_products', 'products.ID=warehouse_products.productID', 'INNER');
-            $this->datatables->join('warehouse', 'warehouse.ID=warehouse_products.warehouseID', 'INNER');
+            $this->datatables->join('warehouse_products AS wp', 'products.ID=wp.productID', 'INNER');
+            $this->datatables->join('warehouse', 'warehouse.ID=wp.warehouseID', 'INNER');
+        else:
+            $this->datatables->join('warehouse_products AS wp', 'products.ID=wp.productID', 'left');
         endif;
         $this->datatables->where($where);
         return $this->datatables->generate('json');
@@ -49,8 +52,8 @@ class Products_model extends CI_Model{
         return $this->db->insert($this->tableName,$data);
     }
 
-    public function getAll($where = array()){
-        return $this->db->where($where)->get($this->tableName)->result();
+    public function getAll($where = array(), $like = array()){
+        return $this->db->where($where)->or_like($like)->get($this->tableName)->result();
     }
 
     public function update($where=array(),$data=array()){

@@ -55,14 +55,14 @@
                                                 <option value="">Anbar</option>
                                                 <?php
                                                 foreach ($warehouses as $warehouse){ ?>
-                                                    <option <?php echo ($warehouse->ID == $purchases->warehouseID) ? "selected":""; ?>
+                                                    <option <?php echo ($warehouse->ID == $purchases->warehouseTo) ? "selected":""; ?>
                                                             value="<?php echo $warehouse->ID; ?>">
                                                         <?php echo $warehouse->name; ?>
                                                     </option>
                                                 <?php }
                                                 ?>
                                             </select>
-                                            <input type="hidden" readonly required id="warehouse" name="warehouse" value="<? echo $purchases->warehouseID; ?>">
+                                            <input type="hidden" readonly required id="warehouse" name="warehouse" value="<? echo $purchases->warehouseTo; ?>">
                                             <?php if(isset($form_error)): ?>
                                                 <span class="font-italic red font-weight-bold"><?php echo form_error('warehouse'); ?></span>
                                             <?php endif; ?>
@@ -76,8 +76,8 @@
                                                 <option value="">Tədarükçü Firma/Şəxs</option>
                                                 <?php
                                                 foreach ($suppliers as $supplier){
-                                                    $selected = ($supplier->ID == $purchases->supplierID) ?"selected":"";
-                                                    echo '<option '.$selected.' value="'.$supplier->ID.'">'.$supplier->name.'</option>';
+                                                    $selected = ($supplier->ID == $purchases->personID) ?"selected":"";
+                                                    echo '<option '.$selected.' value="'.$supplier->ID.'">'.$supplier->fullName.'</option>';
                                                 }
                                                 ?>
                                             </select>
@@ -204,6 +204,7 @@
                                                         <td class="custom-product-td">
                                                             <input type="text" required onfocus="addProduct(this)" name="product-code[]"  class="form-control custom-product-input mySearch product-code" value="<?php echo $purchasesItems[$i]->productCode; ?>">
                                                             <input type="hidden" name="productID[]" class="productID" value="<?php echo $purchasesItems[$i]->productID; ?>">
+                                                            <!--<input type="hidden" name="productWarehouse[]" class="productWarehouse" value="<?php /*echo $purchasesItems[$i]->warehouseTo; */?>">-->
                                                         </td>
                                                         <td class="custom-product-td">
                                                             <input type="text" required name="product-name[]" readonly class="form-control custom-product-input" value="<?php echo $purchasesItems[$i]->productTitle; ?>">
@@ -214,8 +215,8 @@
                                                                 <?php
                                                                 foreach ($units as $unit){ ?>
                                                                    <option
-                                                                   <?php echo ($purchasesItems[$i]->productUnit==$unit->shortName)?"selected":""; ?>
-                                                                           value="<?php echo $unit->shortName;?>">
+                                                                   <?php echo ($purchasesItems[$i]->productUnit==$unit->name)?"selected":""; ?>
+                                                                           value="<?php echo $unit->name;?>">
                                                                        <?php echo $unit->name; ?>
                                                                    </option>
                                                                <?php }

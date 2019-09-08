@@ -12,19 +12,25 @@ class sales extends CI_Controller{
     public function __construct()
     {
         parent::__construct();
+        if(!get_active_user()){
+            redirect(base_url("login"));
+        }
         $this->viewFolder   = "sales_v";
         $this->pageTitle    = "Məhsullar";
         $this->pageTitleExt = PageTitleExt;
-        $this->load->model('sales_model');
-        $this->load->model('sales_items_model');
+        $this->load->model('item_slips_model');
+        $this->load->model('item_handlings_model');
         $this->load->model('warehouse_products_model');
         $this->load->model('bill_Types_model');
+        $this->load->model('biller_model');
         $this->load->model('payment_Types_model');
         $this->load->model('warehouse_model');
-        $this->load->model('customers_model');
+        $this->load->model('persons_model');
         $this->load->model('requisitions_model');
         $this->load->model('currency_model');
         $this->load->model('units_model');
+        $this->load->model('notifications_model');
+        $this->load->model('notification_types_model');
     }
 
     public function index(){
@@ -44,14 +50,15 @@ class sales extends CI_Controller{
         $viewData->subViewFolder    = "add";
         $viewData->pageTitle        = "Çıxış Fakturası Yarat".$this->pageTitleExt;
         $viewData->header           = "Çıxış Fakturası Yarat";
-        $viewData->newCode          = $this->sales_model->generate_autoCode();
+        $viewData->newCode          = $this->item_slips_model->generate_autoCode('ISS');
         $viewData->warehouses       = $this->warehouse_model->getAll();
-        $viewData->customers        = $this->customers_model->getAll();
+        $viewData->customers        = $this->persons_model->getAll(array("personType"=>"customer"));
         $viewData->requisitions     = $this->requisitions_model->getAll();
         $viewData->currency         = $this->currency_model->getAll();
         $viewData->billTypes        = $this->bill_Types_model->getAll(array("type"=>"sale"));
         $viewData->units            = $this->units_model->getAll();
         $viewData->paymentTypes     = $this->payment_Types_model->getAll();
+        $viewData->billers          = $this->persons_model->getAll(array("personType"=>"biller"));
 
         $this->load->view("{$viewData->viewFolder}/{$viewData->subViewFolder}/index",$viewData);
     }
@@ -68,6 +75,8 @@ class sales extends CI_Controller{
         $this->form_validation->set_rules("currency","Məzənnə","required|trim");
         $this->form_validation->set_rules("date","Tarix","required|trim");
         $this->form_validation->set_rules("requisition","Tələbnamə &#8470","trim");
+        $this->form_validation->set_rules("paymentType","Ödəmə Tipi","required|trim");
+        $this->form_validation->set_rules("biller","Biller","required|trim");
         $this->form_validation->set_rules("productID[]","Məhsul ID","required|trim");
         $this->form_validation->set_rules("product-code[]","Məhsul Kodu","required|trim");
         $this->form_validation->set_rules("product-name[]","Məhsul Adı","required|trim");
@@ -95,12 +104,15 @@ class sales extends CI_Controller{
         $checkValidation = $this->form_validation->run();
 
         if($checkValidation){
+            $paymentStatus = ($this->input->post("saveAndPay")) ? "paid": "unpaid";
 
-            $savesale = $this->sales_model->add(array(
+            $saveSale = $this->item_slips_model->add(array(
                 "autoCode"          => $this->input->post("auto-code"),
                 "code"              => $this->input->post("code"),
-                "warehouseID"       => $this->input->post("warehouse"),
-                "customerID"        => $this->input->post("customer"),
+                "warehouseFrom"     => $this->input->post("warehouse"),
+                "slipType"          => 'sale',
+                "billerID"          => $this->input->post("biller"),
+                "personID"          => $this->input->post("customer"),
                 "billType "         => $this->input->post("billType"),
                 "generalDiscountValue" => $this->input->post("generalDiscountValue"),
                 "generalDiscount"   => $this->input->post("generalDiscountValue"),
@@ -111,24 +123,29 @@ class sales extends CI_Controller{
                 "grandTotal"        => $this->input->post("grandTotal"),
                 "total"             => $this->input->post("grandTotal"),
                 "currency"          => $this->input->post("currency"),
+                "paymentTypeID"     => $this->input->post("paymentType"),
+                "paymentStatus"     => $paymentStatus,
+                "waybill"           => $this->input->post("waybill"),
+                "receivedBy"        => $this->input->post("receivedBy"),
                 "requisitionID"     => $this->input->post("requisition"),
                 "date"              => $this->input->post("date")." ".date('H:i:s'),
                 "note"              => $this->input->post("note"),
                 "special1"          => $this->input->post("special-1"),
                 "special2"          => $this->input->post("special-2"),
-                "icon"              => 'fa fa-plus',
-                "userID"            => 1,
-                "billerID"          => 1
+                "icon"              => 'fa fa-minus',
+                "userID"            => 1
             ));
 
-            if($savesale){
+            if($saveSale){
                 $lastInsertId = $this->db->insert_id();
-                $savesaleProducts = false;
+                $saveSaleProducts = false;
 
                 for($i=0;$i<count($this->input->post('productID[]'));$i++){
-                    $savesaleProducts = $this->sales_items_model->add(array(
+                    $saveSaleProducts = $this->item_handlings_model->add(array(
 
-                        "saleID"    => $lastInsertId,
+                        "slipID"        => $lastInsertId,
+                        "slipType"      => 'sale',
+                        "warehouseFrom" => $this->input->post("warehouse"),
                         "productID"     => $this->input->post("productID[]")[$i],
                         "productCode"   => $this->input->post("product-code[]")[$i],
                         "productTitle"  => $this->input->post("product-name[]")[$i],
@@ -139,17 +156,21 @@ class sales extends CI_Controller{
                         "discount"      => $this->input->post("product-discount[]")[$i],
                         "grassTotal"    => $this->input->post("product-grassTotal[]")[$i],
                         "currency"      => $this->input->post("currency"),
-                        "icon"          => "fa fa-plus"
+                        "icon"          => "fa fa-minus"
                     ));
 
-                        $this->warehouse_products_model->addInAmount(
-                        $this->input->post("productID[]")[$i],
-                        $this->input->post("warehouse"),
-                        $this->input->post("product-quantity[]")[$i]
+                        $this->warehouse_products_model->addOutAmount(
+                            $this->input->post("productID[]")[$i],
+                            $this->input->post("warehouse"),
+                            $this->input->post("product-quantity[]")[$i]
                         );
+
+                        /* Check product for notification */
+                        checkProductForNotification($this->input->post("productID[]")[$i], $this->input->post("warehouse"));
+
                 }
 
-                if($savesaleProducts){
+                if($saveSaleProducts){
                     $alert = array(
                         "title"    => "Əməliyyat uğurla yerinə yetirildi",
                         "text"     => "",
@@ -167,7 +188,6 @@ class sales extends CI_Controller{
                     );
                     $this->session->set_flashdata("alert",$alert);
                 }
-
             }
             else{
 
@@ -189,13 +209,15 @@ class sales extends CI_Controller{
             $viewData->subViewFolder    = "add";
             $viewData->pageTitle        = "Çıxış Fakturası Yarat".$this->pageTitleExt;
             $viewData->header           = "Çıxış Fakturası Yarat";
-            $viewData->newCode          = $this->sales_model->generate_autoCode();
+            $viewData->newCode          = $this->item_slips_model->generate_autoCode('ISS');
             $viewData->warehouses       = $this->warehouse_model->getAll();
-            $viewData->suppliers        = $this->suppliers_model->getAll();
+            $viewData->customers        = $this->persons_model->getAll(array("personType"=>"customer"));
             $viewData->requisitions     = $this->requisitions_model->getAll();
             $viewData->currency         = $this->currency_model->getAll();
             $viewData->billTypes        = $this->bill_Types_model->getAll(array("type"=>"sale"));
             $viewData->units            = $this->units_model->getAll();
+            $viewData->paymentTypes     = $this->payment_Types_model->getAll();
+            $viewData->billers          = $this->persons_model->getAll(array("personType"=>"biller"));
             $viewData->form_error       = true;
 
             $this->load->view("{$viewData->viewFolder}/{$viewData->subViewFolder}/index",$viewData);
@@ -210,31 +232,33 @@ class sales extends CI_Controller{
         $viewData->pageTitle        = "Çıxış Fakturası Redaktə Et".$this->pageTitleExt;
         $viewData->header           = "Çıxış Fakturası Redaktə Et";
         $viewData->warehouses       = $this->warehouse_model->getAll();
-        $viewData->suppliers        = $this->suppliers_model->getAll();
+        $viewData->customers        = $this->persons_model->getAll(array("personType"=>"customer"));
         $viewData->requisitions     = $this->requisitions_model->getAll();
         $viewData->currency         = $this->currency_model->getAll();
         $viewData->billTypes        = $this->bill_Types_model->getAll(array("type"=>"sale"));
         $viewData->units            = $this->units_model->getAll();
-        $viewData->sales        = $this->sales_model->get(
+        $viewData->paymentTypes     = $this->payment_Types_model->getAll();
+        $viewData->billers          = $this->persons_model->getAll(array("personType"=>"biller"));
+        $viewData->sales            = $this->item_slips_model->get(
             array(
-                "sales.ID" => $id
+                "item_slips.ID" => $id
             ),
-            array('sales.*',
+            array('item_slips.*',
                 'requisitions.ID AS RID',
                 'requisitions.code AS rCode'
             ),
             array(
                 array(
                     "tableName"   =>'requisitions',
-                    "joinColumns" =>'requisitions.ID=sales.requisitionID',
+                    "joinColumns" =>'requisitions.ID=item_slips.requisitionID',
                     "type"        =>"LEFT"
                 )
             )
         );
 
-        $viewData->salesItems   = $this->sales_items_model->getAll(
+        $viewData->salesItems   = $this->item_handlings_model->getAll(
             array(
-            "saleID" => $id
+            "slipID" => $id
         ));
 
         if(!$viewData->sales || !$viewData->salesItems):
@@ -252,7 +276,7 @@ class sales extends CI_Controller{
         $this->form_validation->set_rules("auto-code","Avto Kod","required|trim");
         $this->form_validation->set_rules("code","Kod","required|trim");
         $this->form_validation->set_rules("warehouse","Anbar","required|trim");
-        $this->form_validation->set_rules("supplier","Tədarükçü","required|trim");
+        $this->form_validation->set_rules("customer","Müştəri","required|trim");
         $this->form_validation->set_rules("billType","Əməliyyat Tipi","required|trim");
         $this->form_validation->set_rules("currency","Məzənnə","required|trim");
         $this->form_validation->set_rules("date","Redaktə Tarixi","required|trim");
@@ -280,16 +304,16 @@ class sales extends CI_Controller{
         $checkValidation = $this->form_validation->run();
 
         if($checkValidation){
-            $oldItems = $this->sales_items_model->getAll(
+            $oldItems = $this->item_handlings_model->getAll(
                 array(
-                    "saleID" => $id
+                    "slipID" => $id
                 ));
             $decreaseAmountCheck = array();
 
             for ($i=0;$i<count($oldItems);$i++) {
-                if ($this->warehouse_products_model->decreaseAmount(
+                if ($this->warehouse_products_model->decreaseOutAmount(
                     $oldItems[$i]->productID,
-                    $this->input->post("warehouse"),
+                    $oldItems[$i]->warehouseFrom,
                     $oldItems[$i]->quantity
                 )){
                     $decreaseAmountCheck[] = true;
@@ -299,21 +323,23 @@ class sales extends CI_Controller{
                 }
             }
 
-            if(!is_array(false,$decreaseAmountCheck)){
+            if(is_array($decreaseAmountCheck) && !in_array(false, $decreaseAmountCheck)){
 
-                $deleteOldData = $this->sales_items_model->delete(
+                $deleteOldData = $this->item_handlings_model->delete(
                   array(
-                   "saleID" => $id
+                   "slipID" => $id
                   ));
+
                 if($deleteOldData){
-                    $updatesale = $this->sales_model->update(
+                    $updatesale = $this->item_slips_model->update(
                         array(
                             "ID"    => $id
                         ),
                         array(
                             "code"              => $this->input->post("code"),
-                            "supplierID"        => $this->input->post("supplier"),
-                            "billType "         => $this->input->post("billType"),
+                            "billerID"          => $this->input->post("biller"),
+                            "personID"          => $this->input->post("customer"),
+                            "billType"          => $this->input->post("billType"),
                             "generalDiscountValue" => $this->input->post("generalDiscountValue"),
                             "generalDiscount"   => $this->input->post("generalDiscountValue"),
                             "totalProductDiscount" => $this->input->post("totalProductDiscount"),
@@ -329,12 +355,15 @@ class sales extends CI_Controller{
                             "special2"          => $this->input->post("special-2"),
                             "userID"            => 1
                         ));
+
                     if($updatesale){
                         $savesaleProducts = false;
                         for($i=0;$i<count($this->input->post('productID[]'));$i++){
-                            $savesaleProducts = $this->sales_items_model->add(array(
+                            $savesaleProducts = $this->item_handlings_model->add(array(
 
-                                "saleID"    => $id,
+                                "slipID"    => $id,
+                                "slipType"  => 'sale',
+                                "warehouseFrom" => $this->input->post("warehouse"),
                                 "productID"     => $this->input->post("productID[]")[$i],
                                 "productCode"   => $this->input->post("product-code[]")[$i],
                                 "productTitle"  => $this->input->post("product-name[]")[$i],
@@ -348,11 +377,13 @@ class sales extends CI_Controller{
                                 "icon"          => "fa fa-plus"
                             ));
 
-                            $this->warehouse_products_model->addInAmount(
+                            $this->warehouse_products_model->addOutAmount(
                                 $this->input->post("productID[]")[$i],
                                 $this->input->post("warehouse"),
                                 $this->input->post("product-quantity[]")[$i]
                             );
+                            /* Check product for notification */
+                            checkProductForNotification($this->input->post("productID[]")[$i], $this->input->post("warehouse"));
                         }
 
                         if($savesaleProducts){
@@ -407,6 +438,7 @@ class sales extends CI_Controller{
                 $this->session->set_flashdata("alert",$alert);
             }
             redirect(base_url('sales'));
+
         }
         else{
 
@@ -416,31 +448,35 @@ class sales extends CI_Controller{
             $viewData->pageTitle        = "Çıxış Fakturası Redaktə Et".$this->pageTitleExt;
             $viewData->header           = "Çıxış Fakturası Redaktə Et";
             $viewData->warehouses       = $this->warehouse_model->getAll();
-            $viewData->suppliers        = $this->suppliers_model->getAll();
+            $viewData->customers        = $this->persons_model->getAll(array("personType"=>"customer"));
             $viewData->requisitions     = $this->requisitions_model->getAll();
             $viewData->currency         = $this->currency_model->getAll();
             $viewData->billTypes        = $this->bill_Types_model->getAll(array("type"=>"sale"));
             $viewData->units            = $this->units_model->getAll();
-            $viewData->sales        = $this->sales_model->get(
+            $viewData->paymentTypes     = $this->payment_Types_model->getAll();
+            $viewData->billers          = $this->persons_model->getAll(array("personType"=>"biller"));
+            $viewData->sales            = $this->item_slips_model->get(
                 array(
-                    "sales.ID" => $id
+                    "item_slips.ID" => $id
                 ),
-                array('sales.*',
+                array('item_slips.*',
                     'requisitions.ID AS RID',
                     'requisitions.code AS rCode'
                 ),
                 array(
                     array(
                         "tableName"   =>'requisitions',
-                        "joinColumns" =>'requisitions.ID=sales.requisitionID',
+                        "joinColumns" =>'requisitions.ID=item_slips.requisitionID',
                         "type"        =>"LEFT"
                     )
                 )
             );
-            $viewData->salesItems   = $this->sales_items_model->getAll(
+
+            $viewData->salesItems   = $this->item_handlings_model->getAll(
                 array(
-                    "saleID" => $id
+                    "slipID" => $id
                 ));
+
             if(!$viewData->sales || !$viewData->salesItems):
                 $viewData->result   = false;
             else: $viewData->result = true;
@@ -453,23 +489,19 @@ class sales extends CI_Controller{
     }
 
     public function delete($id){
-        $oldItems = $this->sales_items_model->getAll(
+        $oldItems = $this->item_handlings_model->getAll(
             array(
-                "saleID" => $id
+                "slipID" => $id
             ));
-        $fetchsale = $this->sales_model->get(array(
-            "ID"    => $id
-        ));
-        $warehousID = $fetchsale->warehouseID;
 
         $decreaseAmountCheck = array();
 
-        if($fetchsale && $oldItems){
+        if($oldItems){
 
             for ($i=0;$i<count($oldItems);$i++) {
-                if ($this->warehouse_products_model->decreaseAmount(
+                if ($this->warehouse_products_model->decreaseOutAmount(
                     $oldItems[$i]->productID,
-                    $warehousID,
+                    $oldItems[$i]->warehouseFrom,
                     $oldItems[$i]->quantity
                 )){
                     $decreaseAmountCheck[] = true;
@@ -482,14 +514,14 @@ class sales extends CI_Controller{
             if(!is_array(false,$decreaseAmountCheck)) {
 
 
-                $deletesale = $this->sales_model->delete(
+                $deletesale = $this->item_slips_model->delete(
                     array(
                         "ID" => $id
                 ));
 
-                $deleteItems = $this->sales_items_model->delete(
+                $deleteItems = $this->item_handlings_model->delete(
                     array(
-                        "saleID" => $id
+                        "slipID" => $id
                     ));
 
 
@@ -542,6 +574,7 @@ class sales extends CI_Controller{
         $rowHtml .= '<td class="custom-product-td">';
         $rowHtml .= '<input type="text" required onfocus="addProduct(this)" name="product-code[]" class="form-control custom-product-input mySearch product-code">';
         $rowHtml .= '<input type="hidden" name="productID[]" class="productID">';
+        /*$rowHtml .= '<input type="hidden" name="productWarehouse[]" class="productWarehouse">';*/
         $rowHtml .= '</td>';
         $rowHtml .= '<td class="custom-product-td">';
         $rowHtml .= '<input type="text" required name="product-name[]" readonly  class="form-control custom-product-input">';
@@ -550,7 +583,7 @@ class sales extends CI_Controller{
         $rowHtml .= '<select name="product-unit[]" required class="form-control custom-product-select">';
         $rowHtml .= '<option value="">Ölçü Vahidi</option>';
         foreach ($units as $unit){
-            $rowHtml .= '<option value="'.$unit->shortName.'">'.$unit->name.'</option>';
+            $rowHtml .= '<option value="'.$unit->name.'">'.$unit->name.'</option>';
         }
         $rowHtml .= '</select>';
         $rowHtml .= '</td>';
@@ -579,6 +612,7 @@ class sales extends CI_Controller{
         $rowHtml .= '<td class="custom-product-td">';
         $rowHtml .= '<input type="text" required onfocus="addProduct(this)" name="product-code[]" class="form-control custom-product-input mySearch product-code">';
         $rowHtml .= '<input type="hidden" name="productID[]" class="productID">';
+        /*$rowHtml .= '<input type="hidden" name="productWarehouse[]" class="productWarehouse">';*/
         $rowHtml .= '</td>';
         $rowHtml .= '<td class="custom-product-td">';
         $rowHtml .= '<input type="text" required name="product-name[]" readonly  class="form-control custom-product-input">';
@@ -587,7 +621,7 @@ class sales extends CI_Controller{
         $rowHtml .= '<select name="product-unit[]" required class="form-control custom-product-select">';
         $rowHtml .= '<option value="">Ölçü Vahidi</option>';
         foreach ($units as $unit){
-            $rowHtml .= '<option value="'.$unit->shortName.'">'.$unit->name.'</option>';
+            $rowHtml .= '<option value="'.$unit->name.'">'.$unit->name.'</option>';
         }
         $rowHtml .= '</select>';
         $rowHtml .= '</td>';
@@ -610,7 +644,7 @@ class sales extends CI_Controller{
     }
 
     public function getDataTable(){
-        echo $this->sales_model->getDataTable();
+        echo $this->item_slips_model->getDataTable($where=array("slipType"=>"sale"));
     }
 
 }

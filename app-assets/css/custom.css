@@ -109,3 +109,21 @@
         max-width: 95% !important;
         width: 95% !important;
     }
+    .mt-2-negative{
+        margin-top: -2px !important;
+    }
+    .input-group-append{
+        height: 2.4rem !important;
+    }
+    .task-more-save-btn{
+        margin-top: 27px !important;
+    }
+    .menu-title{
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    }
+    .mt-6px{
+        margin-top: 6px !important;
+    }
+    .green{
+        color:green !important;
+    }

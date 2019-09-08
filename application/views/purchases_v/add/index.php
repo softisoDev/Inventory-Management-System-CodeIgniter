@@ -34,3 +34,4 @@
 </html>
 
 <?php $this->load->view("includes/modals/products"); ?>
+<?php $this->load->view("includes/modals/message"); ?>

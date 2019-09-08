@@ -11,8 +11,11 @@ class Dashboard extends CI_Controller {
     {
         parent::__construct();
         $this->viewFolder   = "dashboard_v";
-        $this->pageTitle    = "Dashboard";
+        $this->pageTitle    = "Ana səhifə";
         $this->pageTitleExt = PageTitleExt;
+        if(!get_active_user()){
+            redirect(base_url("login"));
+        }
 
     }
 
@@ -21,6 +24,7 @@ class Dashboard extends CI_Controller {
         $viewData->viewFolder       = $this->viewFolder;
         $viewData->subViewFolder    = "list";
         $viewData->pageTitle        = $this->pageTitle.$this->pageTitleExt;
+        $viewData->header           = $this->pageTitle;
 
         $this->load->view("{$viewData->viewFolder}/{$viewData->subViewFolder}/index",$viewData);
     }

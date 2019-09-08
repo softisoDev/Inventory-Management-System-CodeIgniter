@@ -1,10 +1,10 @@
 function addProduct(e) {
-    var focusedTrID = $(e).closest('tr').attr('id');
+    let focusedTrID = $(e).closest('tr').attr('id');
     focusedTrID     = focusedTrID.match(/\d+$/);
     focusedTrID     = parseInt(focusedTrID[0]);
     $('#focused-tr-id').val(focusedTrID);
     /*reInitProductsTable();*/
-    var warehouseID = $('#warehouse').val();
+    let warehouseID = $('#warehouse').val();
     if(warehouseID==""){
         runSweetAlert("Anbar Seçilməyib!","Zəhmət olmasa məhsulu əlavə edəcəyiniz anbarı seçin","warning");
     }
