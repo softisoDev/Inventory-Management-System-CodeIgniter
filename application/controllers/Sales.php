@@ -92,8 +92,7 @@ class sales extends CI_Controller{
         $this->form_validation->set_rules("grandTotal","Yekun Qiymət","required|trim");
         $this->form_validation->set_rules("generalDiscountValue","Ümumi Endirim","trim");
         $this->form_validation->set_rules("waybill","Faktura İrsaliye","trim");
-        $this->form_validation->set_rules("receivedBy","Təhvil Alan","trim");
-        $this->form_validation->set_rules("special-1","Xüsusi Sahə-1","trim");
+        $this->form_validation->set_rules("receivedBy","Təhvil Alan","trim");                                                      $this->form_validation->set_rules("special-1","Xüsusi Sahə-1","trim");
         $this->form_validation->set_rules("special-2","Xüsusi Sahə-2","trim");
         $this->form_validation->set_rules("note","Qeyd","trim");
 

@@ -205,7 +205,7 @@
                 <span class="avatar avatar-online">
                   <img src="app-assets/images/portrait/small/avatar-s-1.png" alt="avatar"><i></i>
                 </span>
-                            <span class="mr-1">Salam,
+                            <span class="mr-1">Hello,
                   <span class="user-name text-bold-700"><?php echo $_SESSION['user']->name; ?></span>
                 </span>
                         </a>
