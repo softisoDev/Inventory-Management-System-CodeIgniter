@@ -203,7 +203,7 @@
                     <li class="dropdown dropdown-user nav-item">
                         <a class="dropdown-toggle nav-link dropdown-user-link" href="#" data-toggle="dropdown">
                 <span class="avatar avatar-online">
-                  <img src="app-assets/images/portrait/small/avatar-s-1.png" alt="avatar"><i></i>
+                  <img src="<?php echo base_url("app-assets/images/portrait/small/avatar-s-1.png"); ?>" alt="avatar"><i></i>
                 </span>
                             <span class="mr-1">Hello,
                   <span class="user-name text-bold-700"><?php echo $_SESSION['user']->name; ?></span>
