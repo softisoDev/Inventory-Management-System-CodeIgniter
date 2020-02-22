@@ -141,12 +141,12 @@ var drawTable = $('#salesTable').DataTable( {
             enabled: false,
             buttons:[
                 {
-                    text:'<i class="la la-eye"></i> Daha Ətraflı',
+                    text:'<i class="la la-eye"></i> Çap et',
                     className:".dt-more-about-item",
                     action: function ( e, dt, node, config ) {
-                        var get_row = drawTable.rows({ selected: true }).nodes();
-                        var dataID = $(get_row[0]).data('id');
-
+                        let get_row = drawTable.rows({ selected: true }).nodes();
+                        let dataID = $(get_row[0]).data('id');
+						window.location.href=app.host+"sales/invoice/"+dataID;
                     }
                 },
                 {
