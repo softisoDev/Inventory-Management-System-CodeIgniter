@@ -71,6 +71,7 @@ $route['categories/add-category']               = "categories/new_form";
 $route['categories/update-category/(.*)']       = "categories/update_form/$1";
 $route['sales/add-sale']                        = "sales/new_form";
 $route['sales/update-sale/(.*)']                = "sales/update_form/$1";
+$route['sales/invoice/(.*)']        			= "sales/makeInvoice/$1";
 $route['recipes/add-recipe']                    = "recipes/new_form";
 $route['recipes/update-recipe/(.*)']            = "recipes/update_form/$1";
 $route['recipes/duplicate/(.*)']                = "recipes/duplicate_new_form/$1";

@@ -353,4 +353,4 @@
 
 const app = new Object();
 
-app.host = "http://localhost/inventory/";
+app.host = "http://inventory.test/";

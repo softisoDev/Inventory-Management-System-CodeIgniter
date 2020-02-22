@@ -34,7 +34,7 @@ class User_operation extends CI_Controller
         $viewData->viewFolder       = $this->viewFolder;
         $viewData->pageTitle        = $this->pageTitle.$this->pageTitleExt;
         $viewData->header           = $this->pageTitle;
-
+		//exit(sha1('admin123'));
         $this->load->view("{$viewData->viewFolder}/index",$viewData);
     }
 

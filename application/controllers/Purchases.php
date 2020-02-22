@@ -831,4 +831,5 @@ class Purchases extends CI_Controller{
         echo $this->item_slips_model->getDataTable($where=array("slipType"=>"purchase"));
     }
 
+
 }

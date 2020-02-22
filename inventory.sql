@@ -744,7 +744,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`ID`, `uname`, `password`, `name`, `surname`, `email`, `img`, `isActive`) VALUES
-(1, 'yalcin', 'abfaca55b8d0ca4ea5ae5f3aa54c682fff13c729', 'Yalçın', 'Çolak', 'ismayil.developer@gmail.com', 'default.png', 1);
+(1, 'admin', 'f865b53623b121fd34ee5426c792e5c33af8c227', 'John', 'Doe', 'admin@admin.com', 'default.png', 1);
 
 -- --------------------------------------------------------
 
