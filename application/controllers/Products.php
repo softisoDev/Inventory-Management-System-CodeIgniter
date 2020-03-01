@@ -450,39 +450,6 @@ class Products extends CI_Controller
 		return $spreadsheet->getActiveSheet()->toArray(null, false, true, true);
 	}
 
-	public function test()
-	{
-		$file = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'test.csv';
-
-		require_once APPPATH . 'third_party/phpSpreadSheet/autoload.php';
-
-		$reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
-		$reader->setInputEncoding('UTF-8');
-
-		$reader->setLoadAllSheets();
-		$reader->setReadDataOnly(true);
-
-		/* Read Csv file as Text */
-		$directData = file_get_contents($file);
-		$comma = substr_count($directData, ",");
-		$semicolon = substr_count($directData, ";");
-
-		/* Set CSV parsing options */
-		if ($comma > $semicolon):
-			$reader->setDelimiter(',');
-		else:
-			$reader->setDelimiter(';');
-		endif;
-
-		$reader->setEnclosure('"');
-		$reader->setSheetIndex(0);
-
-		$spreadsheet = $reader->load($file);
-		$fileData = $spreadsheet->getActiveSheet()->toArray(null, false, true, true);
-
-		print_r($fileData);
-	}
-
 
 }
 
